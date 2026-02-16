@@ -6,769 +6,764 @@
 <title>Bastion Voice</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
 
-/* HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.logo{font-size:18px;font-weight:700;letter-spacing:1px}
-.logo span{color:#f59e0b}
-.header-actions{display:flex;gap:10px}
-.settings-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
-.settings-btn:hover{background:rgba(255,255,255,0.1);color:#e2e8f0}
+/* ─── HEADER ─── */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.logo{font-size:17px;font-weight:700;letter-spacing:1px}.logo span{color:#f59e0b}
+.hdr-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px}
+.hdr-btn:hover{background:rgba(255,255,255,0.1);color:#e2e8f0}
 
-/* MODAL */
+/* ─── MODAL ─── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.active{display:flex}
-.modal{background:#1a1f2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;max-width:460px;width:90%}
-.modal h3{font-size:18px;margin-bottom:8px}
-.modal p{font-size:13px;color:#94a3b8;margin-bottom:20px;line-height:1.5}
-.modal input{width:100%;padding:12px 16px;background:#0a0e1a;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#e2e8f0;font-size:14px;font-family:monospace;margin-bottom:16px}
+.modal{background:#1a1f2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;max-width:440px;width:90%}
+.modal h3{font-size:17px;margin-bottom:6px}
+.modal p{font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.5}
+.modal input{width:100%;padding:11px 14px;background:#0a0e1a;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#e2e8f0;font-size:13px;font-family:monospace;margin-bottom:14px}
 .modal input:focus{outline:none;border-color:#f59e0b}
-.modal-actions{display:flex;gap:12px}
-.btn-primary{flex:1;padding:12px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer}
-.btn-primary:hover{background:#d97706}
-.btn-secondary{padding:12px 20px;background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:14px;cursor:pointer}
+.m-actions{display:flex;gap:10px}
+.btn-p{flex:1;padding:11px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer}
+.btn-p:hover{background:#d97706}
+.btn-s{padding:11px 18px;background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;cursor:pointer}
 
-/* SCREENS */
-.screen{display:none}.screen.active{display:block}
+/* ─── SCREENS ─── */
+.screen{display:none}.screen.active{display:flex;flex-direction:column;align-items:center}
 
-/* AGENT SELECT */
-.agent-select{max-width:900px;margin:0 auto;padding:48px 24px;text-align:center}
-.agent-select h1{font-size:28px;font-weight:700;margin-bottom:8px}
-.agent-select .subtitle{color:#94a3b8;font-size:15px;margin-bottom:40px}
-.agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
-@media(max-width:600px){.agents-grid{grid-template-columns:1fr}}
-.agent-card{background:#111827;border:2px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;cursor:pointer;transition:all 0.3s;position:relative}
-.agent-card:hover{border-color:rgba(245,158,11,0.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(245,158,11,0.08)}
-.agent-card.selected{border-color:#f59e0b;background:#111827}
-.agent-card.selected::after{content:'✓';position:absolute;top:12px;right:12px;background:#f59e0b;color:#0a0e1a;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
-.agent-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 16px;object-fit:cover;border:3px solid rgba(255,255,255,0.1)}
-.agent-card h3{font-size:18px;margin-bottom:4px}
-.agent-card .role{color:#f59e0b;font-size:12px;font-weight:500;margin-bottom:10px}
-.agent-card .desc{color:#94a3b8;font-size:13px;line-height:1.5}
+/* ─── SCREEN 1: AGENT SELECT ─── */
+.pick-wrap{max-width:640px;width:100%;padding:40px 20px}
+.pick-wrap h1{font-size:24px;font-weight:700;text-align:center;margin-bottom:4px}
+.pick-wrap .sub{color:#94a3b8;font-size:14px;text-align:center;margin-bottom:32px}
+.step-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:10px}
+.agents-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+@media(max-width:500px){.agents-row{grid-template-columns:1fr}}
+.ag-card{background:#111827;border:2px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:14px}
+.ag-card:hover{border-color:rgba(245,158,11,0.3)}
+.ag-card.sel{border-color:#f59e0b}
+.ag-av{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.08);flex-shrink:0}
+.ag-info h3{font-size:15px;margin-bottom:1px}.ag-info .role{color:#f59e0b;font-size:11px;font-weight:500}
 
-/* SCENARIO PICKER */
-.scenario-section{text-align:left;max-width:900px;margin:0 auto;padding:0 24px}
-.scenario-section h2{font-size:16px;margin-bottom:16px;color:#94a3b8;font-weight:500}
-.scenarios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
-@media(max-width:700px){.scenarios-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:450px){.scenarios-grid{grid-template-columns:1fr}}
-.scenario-chip{background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.2s;text-align:left}
-.scenario-chip:hover{border-color:rgba(245,158,11,0.3);background:#151b2e}
-.scenario-chip.selected{border-color:#f59e0b;background:rgba(245,158,11,0.05)}
-.scenario-chip .sc-icon{font-size:20px;margin-bottom:6px}
-.scenario-chip .sc-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.scenario-chip .sc-desc{font-size:11px;color:#64748b;line-height:1.4}
+/* ─── SCREEN 2: CONFIG ─── */
+.config-wrap{max-width:580px;width:100%;padding:36px 20px}
+.config-wrap .back-link{color:#94a3b8;font-size:13px;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px}
+.config-wrap .back-link:hover{color:#e2e8f0}
+.config-agent{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.config-agent .av{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.08)}
+.config-agent h2{font-size:18px}.config-agent .role{color:#f59e0b;font-size:12px}
 
-/* START BUTTON */
-.start-session-btn{display:block;margin:0 auto;padding:16px 48px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
-.start-session-btn:hover{background:#d97706;transform:translateY(-1px)}
-.start-session-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
+.cfg-section{margin-bottom:24px}
+.cfg-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:10px}
 
-/* SESSION LAYOUT — DESKTOP 3-COLUMN */
-.session-layout{display:grid;grid-template-columns:1fr 400px 1fr;min-height:calc(100vh - 60px);gap:0}
-@media(max-width:1000px){.session-layout{grid-template-columns:1fr;max-width:640px;margin:0 auto}}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:400px){.goal-grid{grid-template-columns:1fr}}
+.goal-chip{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px;font-size:13px}
+.goal-chip:hover{border-color:rgba(245,158,11,0.3)}
+.goal-chip.sel{border-color:#f59e0b;background:rgba(245,158,11,0.04)}
+.goal-chip .g-icon{font-size:18px;flex-shrink:0}
 
-/* LEFT PANEL — SCENARIO INFO */
-.panel-left{padding:40px 32px;border-right:1px solid rgba(255,255,255,0.04);display:flex;flex-direction:column;align-items:flex-end}
-@media(max-width:1000px){.panel-left{display:none}}
-.scenario-info{max-width:280px;text-align:right}
-.scenario-info h3{font-size:14px;color:#64748b;font-weight:500;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-size:11px}
-.scenario-info .sc-title{font-size:18px;font-weight:600;margin-bottom:8px;color:#e2e8f0}
-.scenario-info .sc-context{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:24px}
-.tips-box{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.1);border-radius:12px;padding:16px;text-align:left}
-.tips-box h4{font-size:12px;color:#f59e0b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
-.tips-box p{font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:6px}
+.scenario-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.sc-chip{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:9px 14px;cursor:pointer;transition:all 0.2s;font-size:12px;font-weight:500}
+.sc-chip:hover{border-color:rgba(245,158,11,0.3)}
+.sc-chip.sel{border-color:#f59e0b;background:rgba(245,158,11,0.04)}
+.custom-input{width:100%;padding:11px 14px;background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e2e8f0;font-size:13px;font-family:inherit;resize:none;line-height:1.5}
+.custom-input:focus{outline:none;border-color:#f59e0b}
+.custom-input::placeholder{color:#475569}
 
-/* CENTER — MAIN SESSION */
-.panel-center{padding:32px 24px;display:flex;flex-direction:column;align-items:center}
-.session-agent-info{text-align:center;margin-bottom:20px}
-.session-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.1);margin-bottom:12px;transition:all 0.3s}
-.session-avatar.speaking{box-shadow:0 0 0 6px rgba(245,158,11,0.15),0 0 0 12px rgba(245,158,11,0.05);border-color:#f59e0b}
-.session-agent-info h2{font-size:20px;margin-bottom:2px}
-.session-agent-info .role{color:#f59e0b;font-size:12px}
+.diff-track{position:relative;width:100%;height:40px;display:flex;align-items:center}
+.diff-track input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:linear-gradient(to right,#22c55e,#f59e0b,#ef4444);outline:none;cursor:pointer}
+.diff-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#e2e8f0;border:3px solid #0a0e1a;box-shadow:0 0 0 2px rgba(255,255,255,0.2);cursor:pointer}
+.diff-labels{display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-top:-2px}
+.diff-labels span{min-width:40px;text-align:center}
+.diff-current{text-align:center;font-size:14px;font-weight:700;margin-top:6px}
 
-/* TURN INDICATOR */
-.turn-indicator{display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:16px;transition:all 0.3s;min-width:200px;justify-content:center}
-.turn-indicator.listening{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.2)}
-.turn-indicator.agent-speaking{background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.2)}
-.turn-indicator.thinking{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
-.turn-indicator.connecting{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
-.turn-indicator.error{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)}
-.turn-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
-.turn-dot.pulse{animation:pulse 1.5s infinite}
+.go-btn{display:block;width:100%;padding:15px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:8px}
+.go-btn:hover{background:#d97706}
+.go-btn:disabled{opacity:0.25;cursor:not-allowed}
+
+/* ─── SCREEN 3: BRIEFING ─── */
+.brief-wrap{max-width:520px;width:100%;padding:40px 20px;text-align:center}
+.brief-av{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.1);margin:0 auto 14px}
+.brief-wrap h2{font-size:20px;margin-bottom:2px}
+.brief-wrap .role{color:#f59e0b;font-size:12px;margin-bottom:24px}
+.brief-card{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:22px;text-align:left;margin-bottom:20px}
+.brief-card h3{font-size:13px;color:#f59e0b;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px}
+.rule{display:flex;gap:10px;margin-bottom:10px;font-size:13px;line-height:1.5;color:#c8d0dc}
+.rule .num{width:22px;height:22px;border-radius:50%;background:rgba(245,158,11,0.12);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.brief-scenario{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:24px;padding:16px;background:rgba(255,255,255,0.02);border-radius:10px;text-align:left}
+.brief-scenario strong{color:#e2e8f0}
+.brief-btn{padding:14px 40px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+.brief-btn:hover{background:#d97706}
+
+/* ─── SCREEN 4: SESSION ─── */
+.sess-wrap{max-width:520px;width:100%;padding:24px 20px;flex:1;display:flex;flex-direction:column;align-items:center}
+.sess-agent{text-align:center;margin-bottom:14px}
+.sess-av{width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.1);margin-bottom:10px;transition:all 0.4s}
+.sess-av.speaking{box-shadow:0 0 0 6px rgba(245,158,11,0.15),0 0 0 14px rgba(245,158,11,0.05);border-color:#f59e0b}
+.sess-agent h2{font-size:18px;margin-bottom:1px}
+.sess-agent .role{color:#f59e0b;font-size:11px}
+
+.turn-ind{display:flex;align-items:center;gap:8px;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:12px;transition:all 0.3s;min-width:220px;justify-content:center}
+.turn-ind.user-turn{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.2)}
+.turn-ind.agent-turn{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
+.turn-ind.processing{background:rgba(148,163,184,0.08);color:#94a3b8;border:1px solid rgba(148,163,184,0.15)}
+.turn-ind.connecting{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
+.turn-ind.warmup{background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.2)}
+.turn-ind.error{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)}
+.t-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.t-dot.pulse{animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-.timer{font-size:28px;font-weight:200;font-variant-numeric:tabular-nums;color:#475569;margin-bottom:16px}
+.timer{font-size:26px;font-weight:200;font-variant-numeric:tabular-nums;color:#475569;margin-bottom:12px}
+.warmup-label{font-size:11px;color:#818cf8;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;display:none}
 
 /* TRANSCRIPT */
-.transcript-box{width:100%;background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;flex:1;min-height:200px;max-height:380px;overflow-y:auto;margin-bottom:16px}
-.transcript-box:empty::before{content:'Conversation will appear here...';color:#475569;font-style:italic;font-size:14px}
-.msg{margin-bottom:10px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;max-width:85%;animation:fadeIn 0.2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{background:rgba(245,158,11,0.1);margin-left:auto;text-align:right;border-bottom-right-radius:4px}
-.msg.assistant{background:rgba(99,102,241,0.08);margin-right:auto;border-bottom-left-radius:4px}
-.msg .label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;opacity:0.5}
-.msg .text{word-wrap:break-word}
+.tx-box{width:100%;background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;flex:1;min-height:180px;max-height:400px;overflow-y:auto;margin-bottom:14px}
+.tx-box:empty::before{content:'Conversation will appear here...';color:#475569;font-style:italic;font-size:13px}
+.msg{margin-bottom:8px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;max-width:88%;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.1);margin-left:auto;text-align:right;border-bottom-right-radius:4px}
+.msg.assistant{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.08);margin-right:auto;border-bottom-left-radius:4px}
+.msg .lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;opacity:0.5}
+.msg .txt{word-wrap:break-word}
 
-/* CONTROLS */
-.controls{display:flex;gap:12px;align-items:center}
-.end-btn{padding:12px 28px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
-.end-btn:hover{background:#b91c1c}
-.mute-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+.controls{display:flex;gap:10px;align-items:center}
+.mute-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
 .mute-btn.muted{background:rgba(239,68,68,0.15);border-color:#dc2626;color:#dc2626}
+.end-btn{padding:11px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.end-btn:hover{background:#b91c1c}
+.kb-hint{font-size:11px;color:#475569;margin-left:8px}
 
-/* RIGHT PANEL — LIVE TIPS */
-.panel-right{padding:40px 32px;border-left:1px solid rgba(255,255,255,0.04)}
-@media(max-width:1000px){.panel-right{display:none}}
-.live-panel{max-width:280px}
-.live-panel h3{font-size:11px;color:#64748b;font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
-.key-shortcut{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:#94a3b8}
-.key{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;font-size:11px;font-family:monospace;color:#e2e8f0}
-.session-stats{margin-top:32px}
-.stat-row{display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px}
-.stat-row .stat-label{color:#64748b}
-.stat-row .stat-val{color:#e2e8f0;font-weight:600}
-
-/* FEEDBACK SCREEN */
-.feedback-view{max-width:700px;margin:0 auto;padding:48px 24px}
-.feedback-header{text-align:center;margin-bottom:36px}
-.feedback-header h1{font-size:24px;margin-bottom:8px}
-.feedback-header p{color:#94a3b8;font-size:14px}
-.feedback-loading{text-align:center;padding:60px;color:#94a3b8}
-.feedback-loading .spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:#f59e0b;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px}
+/* ─── SCREEN 5: REPORT ─── */
+.report-wrap{max-width:600px;width:100%;padding:36px 20px}
+.report-wrap .rpt-loading{text-align:center;padding:60px 20px}
+.rpt-spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:#f59e0b;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:14px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.feedback-content{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px;line-height:1.7;font-size:14px}
-.feedback-content h3{color:#f59e0b;font-size:14px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:0.5px}
-.feedback-content h3:first-child{margin-top:0}
-.feedback-content p{color:#c8d0dc;margin-bottom:8px}
-.feedback-actions{display:flex;gap:12px;margin-top:28px;justify-content:center}
-.feedback-actions button{padding:12px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none}
-.btn-back{background:rgba(255,255,255,0.06);color:#e2e8f0;border:1px solid rgba(255,255,255,0.1) !important}
-.btn-again{background:#f59e0b;color:#0a0e1a}
 
-.footer{text-align:center;padding:16px;font-size:11px;color:#334155;letter-spacing:0.5px}
+/* Report header */
+.rpt-hdr{text-align:center;margin-bottom:32px}
+.rpt-hdr h1{font-size:22px;margin-bottom:4px}
+.rpt-hdr .rpt-meta{font-size:13px;color:#94a3b8}
+
+/* CEFR Score ring */
+.score-ring-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.score-card{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:28px 36px;text-align:center;display:flex;align-items:center;gap:28px}
+.ring-container{position:relative;width:110px;height:110px}
+.ring-container svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:8}
+.ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-level{font-size:28px;font-weight:700;color:#f59e0b}
+.ring-sub{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px}
+.score-details{text-align:left}
+.score-details .sd-row{margin-bottom:10px}
+.sd-label{font-size:11px;color:#64748b;margin-bottom:3px}
+.sd-bar-wrap{display:flex;align-items:center;gap:8px}
+.sd-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.06);width:120px;overflow:hidden}
+.sd-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.sd-val{font-size:12px;font-weight:600;min-width:30px}
+
+/* Report sections */
+.rpt-section{background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:22px;margin-bottom:16px}
+.rpt-section h3{font-size:13px;color:#f59e0b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rpt-section h3 .ico{font-size:16px}
+
+/* Best moment */
+.best-quote{background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;padding:14px 16px;border-radius:0 10px 10px 0;font-size:14px;font-style:italic;line-height:1.6;color:#c8d0dc;margin-bottom:10px}
+.best-why{font-size:12px;color:#94a3b8;line-height:1.5}
+
+/* Corrections */
+.correction{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.correction:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.corr-before{font-size:13px;color:#ef4444;margin-bottom:4px;text-decoration:line-through;opacity:0.7}
+.corr-after{font-size:13px;color:#22c55e;margin-bottom:4px;font-weight:500}
+.corr-note{font-size:12px;color:#94a3b8;line-height:1.4}
+
+/* Phrases to steal — flashcard style */
+.phrase-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.phrase-cards{grid-template-columns:1fr}}
+.phrase-card{background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.1);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.3s;min-height:80px;position:relative}
+.phrase-card:hover{border-color:rgba(245,158,11,0.3)}
+.phrase-card .pc-phrase{font-size:14px;font-weight:600;color:#f59e0b;margin-bottom:4px}
+.phrase-card .pc-meaning{font-size:12px;color:#94a3b8;line-height:1.4}
+.phrase-card .pc-flip{position:absolute;top:8px;right:10px;font-size:10px;color:#475569}
+
+/* Confidence */
+.conf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:450px){.conf-grid{grid-template-columns:1fr}}
+.conf-stat{text-align:center;padding:14px;background:rgba(255,255,255,0.02);border-radius:10px}
+.conf-val{font-size:24px;font-weight:700;margin-bottom:2px}
+.conf-lbl{font-size:11px;color:#64748b}
+
+/* Register */
+.reg-item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.reg-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.reg-said{font-size:13px;color:#94a3b8;margin-bottom:3px}
+.reg-try{font-size:13px;color:#818cf8;font-weight:500;margin-bottom:3px}
+.reg-why{font-size:12px;color:#64748b;line-height:1.4}
+
+/* Pronunciation */
+.pron-item{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pron-word{font-size:14px;font-weight:600;min-width:100px}
+.pron-phonetic{font-size:13px;color:#f59e0b;font-family:monospace}
+.pron-note{font-size:12px;color:#94a3b8}
+
+/* Mission */
+.mission-box{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);border-radius:12px;padding:18px;text-align:center}
+.mission-box .m-title{font-size:12px;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
+.mission-box .m-text{font-size:15px;line-height:1.6;color:#e2e8f0}
+
+/* Report actions */
+.rpt-actions{display:flex;gap:10px;justify-content:center;margin-top:28px}
+.rpt-actions button{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none}
+.rpt-btn-back{background:rgba(255,255,255,0.06);color:#e2e8f0;border:1px solid rgba(255,255,255,0.1) !important}
+.rpt-btn-again{background:#f59e0b;color:#0a0e1a}
 </style>
 </head>
 <body>
 
-<!-- API KEY MODAL -->
+<!-- KEY MODAL -->
 <div class="modal-overlay" id="keyModal">
-  <div class="modal">
-    <h3>OpenAI API Key</h3>
-    <p>Your key is sent over HTTPS to your own server to mint a one-time session token, then discarded. Never stored.</p>
-    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeKeyModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveKey()">Connect</button>
-    </div>
-  </div>
+<div class="modal">
+<h3>OpenAI API Key</h3>
+<p>Sent over HTTPS to mint a one-time session token, then discarded. Never stored.</p>
+<input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+<div class="m-actions">
+<button class="btn-s" onclick="closeModal()">Cancel</button>
+<button class="btn-p" onclick="saveKey()">Connect</button>
+</div>
+</div>
 </div>
 
-<!-- HEADER -->
 <div class="header">
-  <div class="logo">BASTION <span>VOICE</span></div>
-  <div class="header-actions">
-    <button class="settings-btn" onclick="openKeyModal()">API Key</button>
-  </div>
+<div class="logo">BASTION <span>VOICE</span></div>
+<button class="hdr-btn" onclick="openModal()">API Key</button>
 </div>
 
-<!-- SCREEN 1: SELECT AGENT + SCENARIO -->
-<div class="screen active" id="selectScreen">
-  <div class="agent-select">
-    <h1>Practice Lab</h1>
-    <p class="subtitle">Choose your conversation partner and scenario</p>
-    <div class="agents-grid">
-      <div class="agent-card" id="card-marcus" onclick="selectAgent('marcus')">
-        <img class="agent-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Marcus">
-        <h3>Marcus Chen</h3>
-        <div class="role">Senior VP, Global Operations</div>
-        <div class="desc">Direct, strategic. Challenges your reasoning and pushes you to defend positions.</div>
-      </div>
-      <div class="agent-card" id="card-elena" onclick="selectAgent('elena')">
-        <img class="agent-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Elena">
-        <h3>Elena Dubois</h3>
-        <div class="role">Managing Director, International Consulting</div>
-        <div class="desc">Articulate, sophisticated. Tests rapport-building and structured communication.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="scenario-section">
-    <h2>Choose a scenario</h2>
-    <div class="scenarios-grid">
-      <div class="scenario-chip" onclick="selectScenario(0)">
-        <div class="sc-icon">💼</div>
-        <div class="sc-name">Client Pitch</div>
-        <div class="sc-desc">Present your proposal and handle objections</div>
-      </div>
-      <div class="scenario-chip" onclick="selectScenario(1)">
-        <div class="sc-icon">🤝</div>
-        <div class="sc-name">Negotiation</div>
-        <div class="sc-desc">Negotiate terms, pricing, or contract details</div>
-      </div>
-      <div class="scenario-chip" onclick="selectScenario(2)">
-        <div class="sc-icon">📊</div>
-        <div class="sc-name">Quarterly Review</div>
-        <div class="sc-desc">Present results and field tough questions</div>
-      </div>
-      <div class="scenario-chip" onclick="selectScenario(3)">
-        <div class="sc-icon">🎯</div>
-        <div class="sc-name">Job Interview</div>
-        <div class="sc-desc">Practice behavioral and competency questions</div>
-      </div>
-      <div class="scenario-chip" onclick="selectScenario(4)">
-        <div class="sc-icon">⚡</div>
-        <div class="sc-name">Crisis Management</div>
-        <div class="sc-desc">Handle a PR crisis or internal emergency call</div>
-      </div>
-      <div class="scenario-chip" onclick="selectScenario(5)">
-        <div class="sc-icon">🌍</div>
-        <div class="sc-name">Free Conversation</div>
-        <div class="sc-desc">Open business discussion, no specific scenario</div>
-      </div>
-    </div>
-    <button class="start-session-btn" id="startBtn" disabled onclick="startSession()">Select an agent to start</button>
-  </div>
+<!-- ═══ SCREEN 1: PICK AGENT ═══ -->
+<div class="screen active" id="scrPick">
+<div class="pick-wrap">
+<h1>Practice Lab</h1>
+<p class="sub">Choose your conversation partner</p>
+<div class="step-label">Your partner</div>
+<div class="agents-row">
+<div class="ag-card" onclick="pickAgent('marcus')">
+<img class="ag-av" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+<div class="ag-info"><h3>Marcus Chen</h3><div class="role">Senior VP, Global Operations</div></div>
+</div>
+<div class="ag-card" onclick="pickAgent('elena')">
+<img class="ag-av" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+<div class="ag-info"><h3>Elena Dubois</h3><div class="role">Managing Director, Consulting</div></div>
+</div>
+</div>
+</div>
 </div>
 
-<!-- SCREEN 2: LIVE SESSION -->
-<div class="screen" id="sessionScreen">
-  <div class="session-layout">
-
-    <!-- LEFT PANEL -->
-    <div class="panel-left">
-      <div class="scenario-info">
-        <h3>Scenario</h3>
-        <div class="sc-title" id="panelScenarioName">—</div>
-        <div class="sc-context" id="panelScenarioContext">—</div>
-        <div class="tips-box">
-          <h4>Speaking Tips</h4>
-          <p>→ Use full sentences, avoid one-word answers</p>
-          <p>→ Structure responses: point, evidence, conclusion</p>
-          <p>→ Pause before answering — it shows confidence</p>
-          <p>→ Use transition phrases: "Building on that...", "From my perspective..."</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- CENTER -->
-    <div class="panel-center">
-      <div class="session-agent-info">
-        <img class="session-avatar" id="sessionAvatar" src="" alt="">
-        <h2 id="sessionName"></h2>
-        <div class="role" id="sessionRole"></div>
-      </div>
-
-      <div class="turn-indicator connecting" id="turnIndicator">
-        <div class="turn-dot pulse"></div>
-        <span id="turnText">Connecting...</span>
-      </div>
-
-      <div class="timer" id="timer">00:00</div>
-      <div class="transcript-box" id="transcript"></div>
-
-      <div class="controls">
-        <button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="Mute (M)">🎤</button>
-        <button class="end-btn" onclick="endSession()">End Session</button>
-      </div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="panel-right">
-      <div class="live-panel">
-        <h3>Shortcuts</h3>
-        <div class="key-shortcut"><span class="key">M</span> Mute / Unmute</div>
-        <div class="key-shortcut"><span class="key">ESC</span> End session</div>
-
-        <div class="session-stats">
-          <h3 style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Session Stats</h3>
-          <div class="stat-row"><span class="stat-label">Duration</span><span class="stat-val" id="statDuration">00:00</span></div>
-          <div class="stat-row"><span class="stat-label">Your turns</span><span class="stat-val" id="statUserTurns">0</span></div>
-          <div class="stat-row"><span class="stat-label">Agent turns</span><span class="stat-val" id="statAgentTurns">0</span></div>
-          <div class="stat-row"><span class="stat-label">Your words</span><span class="stat-val" id="statUserWords">0</span></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+<!-- ═══ SCREEN 2: CONFIG ═══ -->
+<div class="screen" id="scrConfig">
+<div class="config-wrap">
+<div class="back-link" onclick="showScr('scrPick')">← Back</div>
+<div class="config-agent">
+<img class="av" id="cfgAv" src="" alt="">
+<div><h2 id="cfgName"></h2><div class="role" id="cfgRole"></div></div>
 </div>
 
-<!-- SCREEN 3: POST-SESSION FEEDBACK -->
-<div class="screen" id="feedbackScreen">
-  <div class="feedback-view">
-    <div class="feedback-header">
-      <h1>Session Complete</h1>
-      <p>Analyzing your conversation...</p>
-    </div>
-    <div class="feedback-loading" id="feedbackLoading">
-      <div class="spinner"></div>
-      <p>Generating your feedback report...</p>
-    </div>
-    <div class="feedback-content" id="feedbackContent" style="display:none"></div>
-    <div class="feedback-actions" id="feedbackActions" style="display:none">
-      <button class="btn-back" onclick="backToSelect()">Choose New Scenario</button>
-      <button class="btn-again" onclick="tryAgain()">Practice Again</button>
-    </div>
-  </div>
+<div class="cfg-section">
+<div class="cfg-label">What do you want to practice?</div>
+<div class="goal-grid">
+<div class="goal-chip" onclick="pickGoal(0)"><span class="g-icon">🗣️</span>Fluency & Confidence</div>
+<div class="goal-chip" onclick="pickGoal(1)"><span class="g-icon">📝</span>Grammar & Accuracy</div>
+<div class="goal-chip" onclick="pickGoal(2)"><span class="g-icon">📚</span>Vocabulary Building</div>
+<div class="goal-chip" onclick="pickGoal(3)"><span class="g-icon">🎯</span>Pitch & Persuasion</div>
+<div class="goal-chip" onclick="pickGoal(4)"><span class="g-icon">🤝</span>Negotiation Skills</div>
+<div class="goal-chip" onclick="pickGoal(5)"><span class="g-icon">☕</span>Small Talk & Rapport</div>
+</div>
 </div>
 
-<div class="footer">BASTION VOICE</div>
+<div class="cfg-section">
+<div class="cfg-label">Scenario</div>
+<div class="scenario-chips">
+<div class="sc-chip" onclick="pickSc(0)">💼 Client Pitch</div>
+<div class="sc-chip" onclick="pickSc(1)">🤝 Negotiation</div>
+<div class="sc-chip" onclick="pickSc(2)">📊 Quarterly Review</div>
+<div class="sc-chip" onclick="pickSc(3)">🎯 Job Interview</div>
+<div class="sc-chip" onclick="pickSc(4)">⚡ Crisis Call</div>
+<div class="sc-chip" onclick="pickSc(5)">🌍 Free Chat</div>
+</div>
+<textarea class="custom-input" id="customScenario" rows="2" placeholder="Or describe your own: 'I have a pricing negotiation with my German client tomorrow...'"></textarea>
+</div>
+
+<div class="cfg-section">
+<div class="cfg-label">Difficulty — <span id="diffLabel" style="color:#f59e0b">B2 Intermediate</span></div>
+<div class="diff-track">
+<input type="range" min="0" max="2" value="1" id="diffSlider" oninput="updateDiff()">
+</div>
+<div class="diff-labels"><span>B1 Pre-Intermediate</span><span>B2 Intermediate</span><span>C1 Advanced</span></div>
+</div>
+
+<button class="go-btn" id="goBtn" disabled onclick="goToBriefing()">Choose a goal to continue</button>
+</div>
+</div>
+
+<!-- ═══ SCREEN 3: BRIEFING ═══ -->
+<div class="screen" id="scrBrief">
+<div class="brief-wrap">
+<img class="brief-av" id="brAv" src="" alt="">
+<h2 id="brName"></h2>
+<div class="role" id="brRole"></div>
+<div class="brief-card">
+<h3>How this works</h3>
+<div class="rule"><div class="num">1</div><div>You'll start with a <strong>quick warm-up</strong> — casual chat to get comfortable. Just be yourself.</div></div>
+<div class="rule"><div class="num">2</div><div>Then the <strong>scenario begins</strong>. Treat it like a real conversation — there are no wrong answers.</div></div>
+<div class="rule"><div class="num">3</div><div>Your partner will <strong>naturally model better phrasing</strong> — listen for how they say things.</div></div>
+<div class="rule"><div class="num">4</div><div>When you're done, you'll get a <strong>personal coaching report</strong> with specific feedback.</div></div>
+</div>
+<div class="brief-scenario" id="brScenario"></div>
+<button class="brief-btn" onclick="startSession()">Start Conversation</button>
+</div>
+</div>
+
+<!-- ═══ SCREEN 4: SESSION ═══ -->
+<div class="screen" id="scrSession">
+<div class="sess-wrap">
+<div class="sess-agent">
+<img class="sess-av" id="sessAv" src="" alt="">
+<h2 id="sessName"></h2>
+<div class="role" id="sessRole"></div>
+</div>
+<div class="turn-ind connecting" id="turnInd"><div class="t-dot pulse"></div><span id="turnTxt">Connecting...</span></div>
+<div class="warmup-label" id="warmupLabel">☕ Warm-up</div>
+<div class="timer" id="timer">00:00</div>
+<div class="tx-box" id="transcript"></div>
+<div class="controls">
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="Mute (M)">🎤</button>
+<button class="end-btn" onclick="endSession()">End Session</button>
+<span class="kb-hint">M = mute · Esc = end</span>
+</div>
+</div>
+</div>
+
+<!-- ═══ SCREEN 5: REPORT ═══ -->
+<div class="screen" id="scrReport">
+<div class="report-wrap">
+<div class="rpt-loading" id="rptLoading">
+<div class="rpt-spinner"></div>
+<p style="color:#94a3b8">Generating your coaching report...</p>
+</div>
+<div id="rptContent" style="display:none"></div>
+</div>
+</div>
 
 <script>
-// ─── SCENARIOS ──────────────────────────────────────────
-var SCENARIOS = [
-  {
-    name: "Client Pitch",
-    icon: "💼",
-    context: "You are pitching a new service or product to a potential client. Convince them of the value, handle objections, and try to close the deal.",
-    prompt: "The conversation is a client pitch meeting. The user is pitching a product or service to you. Be a realistic potential client — show interest but raise real objections about price, timeline, competition, and ROI. Make them earn the deal."
-  },
-  {
-    name: "Negotiation",
-    icon: "🤝",
-    context: "You are negotiating contract terms, pricing, or partnership details. Find common ground while protecting your interests.",
-    prompt: "This is a business negotiation. You and the user are negotiating terms of a deal. Be firm on some points, flexible on others. Test their ability to find creative solutions and compromise while maintaining their position."
-  },
-  {
-    name: "Quarterly Review",
-    icon: "📊",
-    context: "You are presenting quarterly results to senior leadership. Expect tough questions about performance, forecasts, and strategy.",
-    prompt: "The user is presenting their quarterly business results to you. Ask sharp questions about the numbers, challenge weak areas, ask for explanations of misses, and probe their strategic thinking. Be fair but demanding."
-  },
-  {
-    name: "Job Interview",
-    icon: "🎯",
-    context: "You are interviewing for a senior role. Expect behavioral questions, competency tests, and pressure questions.",
-    prompt: "You are interviewing the user for a senior position at your company. Ask a mix of behavioral questions (tell me about a time...), competency questions, and some curveball questions. Evaluate their communication clarity, confidence, and structured thinking."
-  },
-  {
-    name: "Crisis Management",
-    icon: "⚡",
-    context: "A crisis has hit — a PR disaster, product recall, or internal incident. You need to communicate clearly under pressure.",
-    prompt: "A crisis situation has just occurred — a major product failure that is getting media attention. The user needs to brief you (as a senior stakeholder) on what happened, what the plan is, and answer your tough questions. Be urgent and demanding but fair. Test their crisis communication skills."
-  },
-  {
-    name: "Free Conversation",
-    icon: "🌍",
-    context: "Open business discussion. Talk about industry trends, leadership, strategy, or any professional topic.",
-    prompt: "Have a natural, open-ended business conversation with the user. Discuss industry trends, leadership challenges, market opportunities, or any professional topic. Be engaging and intellectually stimulating. Let the conversation flow naturally."
-  }
-];
-
-// ─── AGENTS ─────────────────────────────────────────────
-var AGENTS = {
-  marcus: {
-    name: "Marcus Chen",
-    role: "Senior VP, Global Operations",
-    voice: "ash",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    baseInstructions: "You are Marcus Chen, Senior Vice President of Global Operations at a large multinational corporation. You are in a conversation with a business professional who is practicing their English communication skills.\n\nYour personality: Direct, strategic, intellectually rigorous but fair. You speak with authority but respect competence. You occasionally challenge weak arguments.\n\nCommunication rules:\n- Start with a warm but professional greeting, then dive into the scenario naturally\n- If they make grammar or vocabulary errors, do not interrupt but weave gentle corrections into your own speech naturally\n- Adjust your language complexity based on their level\n- Be encouraging when they express ideas well\n- Keep responses conversational, 2-4 sentences typically, not lectures\n- Occasionally use idiomatic business English that challenges them\n\nYou are NOT a language teacher. You are a senior executive having a real business conversation. The learning happens through the conversation itself."
-  },
-  elena: {
-    name: "Elena Dubois",
-    role: "Managing Director, International Consulting",
-    voice: "marin",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    baseInstructions: "You are Elena Dubois, Managing Director at a prestigious international consulting firm. You are in a conversation with a business professional who is practicing their English communication skills.\n\nYour personality: Articulate, warm but professional, culturally sophisticated. You value clarity and precision in communication. You are diplomatic but direct when needed.\n\nCommunication rules:\n- Start with a professional but friendly greeting, establish the scenario context naturally\n- If they make grammar or vocabulary errors, model the correct form naturally in your response without explicitly correcting them\n- Ask questions that require structured thinking\n- Adjust complexity based on their level\n- Be genuinely interested in their ideas, react naturally\n- Keep responses conversational, 2-4 sentences typically\n- Use sophisticated but accessible business English\n\nYou are NOT a language teacher. You are a senior consulting director having a real business conversation. The learning happens organically through the dialogue."
-  }
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+var AGENTS={
+marcus:{name:"Marcus Chen",first:"Marcus",role:"Senior VP, Global Operations",voice:"ash",avatar:"https://randomuser.me/api/portraits/men/32.jpg",
+base:"You are Marcus Chen, Senior Vice President of Global Operations at a large multinational corporation. You are having a real business conversation with a professional who is practicing English.\n\nPersonality: Direct, strategic, intellectually rigorous but fair. You speak with authority but respect competence. You occasionally challenge weak arguments.\n\nRules:\n- Keep responses 2-4 sentences, conversational not lecture-style\n- If they make grammar/vocab errors, weave gentle corrections into YOUR responses naturally (model the correct form)\n- If you notice a pronunciation issue (they seem to struggle with a word), work it naturally into your response so they hear the correct version\n- Occasionally introduce 2-3 sophisticated business phrases slightly above their level\n- React naturally to their ideas — agree, push back, ask follow-ups\n- Be encouraging when they express ideas well\n\nYou are NOT a language teacher. You are a senior executive having a real conversation. Learning happens through the dialogue itself."},
+elena:{name:"Elena Dubois",first:"Elena",role:"Managing Director, Consulting",voice:"marin",avatar:"https://randomuser.me/api/portraits/women/44.jpg",
+base:"You are Elena Dubois, Managing Director at a prestigious international consulting firm. You are having a real business conversation with a professional who is practicing English.\n\nPersonality: Articulate, warm but professional, culturally sophisticated. You value clarity and precision. Diplomatic but direct when needed.\n\nRules:\n- Keep responses 2-4 sentences, conversational not lecture-style\n- If they make grammar/vocab errors, model the correct form naturally in YOUR response without explicitly correcting\n- If you notice a pronunciation issue, work the word naturally into your response so they hear it correctly\n- Introduce 2-3 sophisticated business phrases slightly above their level per conversation\n- Ask questions that require structured thinking\n- React genuinely — be interested, agree, challenge, follow up\n\nYou are NOT a language teacher. You are a senior consulting director having a real conversation. Learning happens organically through dialogue."}
 };
 
-// ─── STATE ──────────────────────────────────────────────
-var manualApiKey = null;
-var peerConnection = null;
-var dataChannel = null;
-var localStream = null;
-var timerInterval = null;
-var sessionStartTime = null;
-var currentAgent = null;
-var currentAgentId = null;
-var selectedAgentId = null;
-var selectedScenarioIdx = null;
-var isMuted = false;
-var pendingMsgEl = null;
-var pendingMsgRole = null;
-var currentAssistantText = "";
-var currentUserText = "";
-var userTurns = 0;
-var agentTurns = 0;
-var userWordCount = 0;
-var fullTranscript = [];
-var isAgentSpeaking = false;
+var GOALS=[
+{name:"Fluency & Confidence",prompt:"Focus on getting the user to speak more, use longer sentences, and reduce hesitation. Encourage them to elaborate and express complex ideas. Don't interrupt flow to correct."},
+{name:"Grammar & Accuracy",prompt:"Pay extra attention to grammar modeling. When they make errors, make sure your response naturally uses the correct form prominently. Focus on tense consistency, articles, prepositions, and word order."},
+{name:"Vocabulary Building",prompt:"Deliberately use 4-5 sophisticated business phrases in the conversation. Use context clues so meaning is clear. Introduce phrases like 'leverage our position', 'circle back on that', 'take a deep dive', 'move the needle', 'align on objectives'. Vary based on difficulty level."},
+{name:"Pitch & Persuasion",prompt:"Test their ability to structure arguments persuasively. Ask them to convince you. Push back on weak points. Evaluate their use of persuasive language, evidence, and structure."},
+{name:"Negotiation Skills",prompt:"Create situations requiring compromise and creative problem-solving. Be firm on some points, flexible on others. Test their ability to find win-win solutions and use diplomatic language."},
+{name:"Small Talk & Rapport",prompt:"Focus on casual professional conversation. Test their ability to build rapport, find common ground, use appropriate humor, and transition naturally between topics. This is about social fluency."}
+];
 
-// ─── MODAL ──────────────────────────────────────────────
-function openKeyModal() {
-  document.getElementById("keyModal").classList.add("active");
-  document.getElementById("apiKeyInput").focus();
-}
-function closeKeyModal() { document.getElementById("keyModal").classList.remove("active"); }
-function saveKey() {
-  var key = document.getElementById("apiKeyInput").value.trim();
-  if (key && key.startsWith("sk-")) { manualApiKey = key; closeKeyModal(); }
-  else alert("Please enter a valid OpenAI API key (starts with sk-)");
-}
+var SCENARIOS=[
+{name:"Client Pitch",prompt:"This is a client pitch meeting. The user is presenting a proposal to you. Show interest but raise real objections about price, timeline, and ROI."},
+{name:"Negotiation",prompt:"You are negotiating contract terms. Be firm on some points, flexible on others. Test creative problem-solving."},
+{name:"Quarterly Review",prompt:"The user is presenting quarterly results. Ask sharp questions about numbers, challenge weak areas, probe strategy."},
+{name:"Job Interview",prompt:"You are interviewing the user for a senior role. Mix behavioral, competency, and curveball questions."},
+{name:"Crisis Call",prompt:"A major product failure is getting media attention. The user must brief you on the situation, the plan, and answer tough questions urgently."},
+{name:"Free Chat",prompt:"Open business conversation. Discuss trends, leadership, strategy. Be engaging and intellectually stimulating. Let it flow naturally."}
+];
 
-// ─── SELECTION ──────────────────────────────────────────
-function selectAgent(id) {
-  selectedAgentId = id;
-  document.querySelectorAll(".agent-card").forEach(function(c) { c.classList.remove("selected"); });
-  document.getElementById("card-" + id).classList.add("selected");
-  updateStartBtn();
-}
+var DIFFS=[
+{label:"B1 Pre-Intermediate",prompt:"Speak simply and clearly. Use short sentences. Avoid complex idioms. Speak at a moderate pace. If they struggle, rephrase to help them understand."},
+{label:"B2 Intermediate",prompt:"Speak naturally at a normal pace. Use common business idioms and phrasal verbs. Challenge them but don't overwhelm."},
+{label:"C1 Advanced",prompt:"Speak at full native speed. Use sophisticated vocabulary, complex sentence structures, idioms, and nuanced language. Don't simplify. Challenge them intellectually."}
+];
 
-function selectScenario(idx) {
-  selectedScenarioIdx = idx;
-  document.querySelectorAll(".scenario-chip").forEach(function(c) { c.classList.remove("selected"); });
-  document.querySelectorAll(".scenario-chip")[idx].classList.add("selected");
-  updateStartBtn();
-}
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+var apiKey=null,pc=null,dc=null,stream=null,timerInt=null,startTime=null;
+var selAgent=null,selGoal=null,selSc=null,diffVal=1;
+var isMuted=false,pendEl=null,pendRole=null;
+var curAssText="",curUserText="";
+var userTurns=0,agentTurns=0,userWords=0,transcript=[];
+var isAgentSpeaking=false;
+var turnTimestamps=[]; // {role,startMs}
+var warmupDone=false,warmupTimer=null;
 
-function updateStartBtn() {
-  var btn = document.getElementById("startBtn");
-  if (selectedAgentId && selectedScenarioIdx !== null) {
-    btn.disabled = false;
-    btn.textContent = "Start Conversation →";
-  } else if (selectedAgentId) {
-    btn.disabled = true;
-    btn.textContent = "Now pick a scenario";
-  } else {
-    btn.disabled = true;
-    btn.textContent = "Select an agent to start";
-  }
-}
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+function openModal(){document.getElementById("keyModal").classList.add("active");document.getElementById("apiKeyInput").focus()}
+function closeModal(){document.getElementById("keyModal").classList.remove("active")}
+function saveKey(){var k=document.getElementById("apiKeyInput").value.trim();if(k&&k.startsWith("sk-")){apiKey=k;closeModal()}else alert("Enter a valid key (starts with sk-)")}
 
-// ─── SCREENS ────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
-  document.getElementById(id).classList.add("active");
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showScr(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active")});document.getElementById(id).classList.add("active")}
+
+// ─── SCREEN 1: PICK AGENT ───
+function pickAgent(id){
+selAgent=id;
+document.querySelectorAll(".ag-card").forEach(function(c){c.classList.remove("sel")});
+event.currentTarget.classList.add("sel");
+// Go to config
+var a=AGENTS[id];
+document.getElementById("cfgAv").src=a.avatar;
+document.getElementById("cfgName").textContent=a.name;
+document.getElementById("cfgRole").textContent=a.role;
+selGoal=null;selSc=null;
+document.querySelectorAll(".goal-chip").forEach(function(c){c.classList.remove("sel")});
+document.querySelectorAll(".sc-chip").forEach(function(c){c.classList.remove("sel")});
+document.getElementById("customScenario").value="";
+updateGoBtn();
+showScr("scrConfig");
 }
 
-// ─── TURN INDICATOR ─────────────────────────────────────
-function setTurn(type, text) {
-  var el = document.getElementById("turnIndicator");
-  el.className = "turn-indicator " + type;
-  document.getElementById("turnText").textContent = text;
+// ─── SCREEN 2: CONFIG ───
+function pickGoal(i){
+selGoal=i;
+document.querySelectorAll(".goal-chip").forEach(function(c){c.classList.remove("sel")});
+document.querySelectorAll(".goal-chip")[i].classList.add("sel");
+updateGoBtn();
+}
+function pickSc(i){
+selSc=i;
+document.querySelectorAll(".sc-chip").forEach(function(c){c.classList.remove("sel")});
+document.querySelectorAll(".sc-chip")[i].classList.add("sel");
+document.getElementById("customScenario").value="";
+updateGoBtn();
+}
+document.getElementById("customScenario").addEventListener("input",function(){
+if(this.value.trim()){selSc=-1;document.querySelectorAll(".sc-chip").forEach(function(c){c.classList.remove("sel")})}
+updateGoBtn();
+});
+function updateDiff(){
+diffVal=parseInt(document.getElementById("diffSlider").value);
+document.getElementById("diffLabel").textContent=DIFFS[diffVal].label;
+}
+function updateGoBtn(){
+var btn=document.getElementById("goBtn");
+var hasSc=selSc!==null||document.getElementById("customScenario").value.trim();
+if(selGoal!==null&&hasSc){btn.disabled=false;btn.textContent="Continue →"}
+else if(selGoal!==null){btn.disabled=true;btn.textContent="Now pick a scenario"}
+else{btn.disabled=true;btn.textContent="Choose a goal to continue"}
 }
 
-// ─── START SESSION ──────────────────────────────────────
-async function startSession() {
-  if (!manualApiKey) { openKeyModal(); return; }
-  if (!selectedAgentId || selectedScenarioIdx === null) return;
-
-  currentAgentId = selectedAgentId;
-  currentAgent = AGENTS[selectedAgentId];
-  var scenario = SCENARIOS[selectedScenarioIdx];
-
-  // Build instructions with scenario
-  var instructions = currentAgent.baseInstructions + "\n\nSCENARIO CONTEXT:\n" + scenario.prompt;
-
-  // Update UI
-  document.getElementById("sessionAvatar").src = currentAgent.avatar;
-  document.getElementById("sessionName").textContent = currentAgent.name;
-  document.getElementById("sessionRole").textContent = currentAgent.role;
-  document.getElementById("transcript").innerHTML = "";
-  document.getElementById("panelScenarioName").textContent = scenario.icon + " " + scenario.name;
-  document.getElementById("panelScenarioContext").textContent = scenario.context;
-
-  // Reset stats
-  userTurns = 0; agentTurns = 0; userWordCount = 0; fullTranscript = [];
-  document.getElementById("statUserTurns").textContent = "0";
-  document.getElementById("statAgentTurns").textContent = "0";
-  document.getElementById("statUserWords").textContent = "0";
-
-  setTurn("connecting", "Connecting...");
-  showScreen("sessionScreen");
-
-  try {
-    setTurn("connecting", "Getting session token...");
-    var body = {
-      voice: currentAgent.voice,
-      instructions: instructions,
-      model: "gpt-realtime-mini",
-      apiKey: manualApiKey
-    };
-
-    var tokenRes = await fetch("/api/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    var tokenData = await tokenRes.json();
-
-    if (!tokenRes.ok) {
-      if (tokenData.error === "NO_KEY") { setTurn("error", "No API key"); openKeyModal(); return; }
-      throw new Error(tokenData.message || "Failed to get session token");
-    }
-
-    var ephemeralKey = tokenData.clientSecret;
-    if (!ephemeralKey) throw new Error("No client secret returned. Check OpenAI billing.");
-
-    setTurn("connecting", "Requesting microphone...");
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-    setTurn("connecting", "Establishing connection...");
-    peerConnection = new RTCPeerConnection();
-
-    var audioEl = document.createElement("audio");
-    audioEl.autoplay = true;
-    peerConnection.ontrack = function(e) { audioEl.srcObject = e.streams[0]; };
-    var tracks = localStream.getTracks();
-    for (var i = 0; i < tracks.length; i++) peerConnection.addTrack(tracks[i], localStream);
-
-    dataChannel = peerConnection.createDataChannel("oai-events");
-    dataChannel.addEventListener("message", handleServerEvent);
-
-    var offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-
-    var sdpRes = await fetch("https://api.openai.com/v1/realtime/calls", {
-      method: "POST",
-      body: offer.sdp,
-      headers: { "Authorization": "Bearer " + ephemeralKey, "Content-Type": "application/sdp" }
-    });
-
-    if (!sdpRes.ok) {
-      var errText = await sdpRes.text();
-      throw new Error("WebRTC failed (" + sdpRes.status + "): " + errText);
-    }
-
-    var sdpAnswer = await sdpRes.text();
-    await peerConnection.setRemoteDescription({ type: "answer", sdp: sdpAnswer });
-
-    peerConnection.onconnectionstatechange = function() {
-      var state = peerConnection.connectionState;
-      if (state === "connected") { setTurn("listening", "Your turn — start speaking"); startTimer(); }
-      else if (state === "failed" || state === "disconnected") { setTurn("error", "Connection lost"); }
-    };
-  } catch (err) {
-    console.error("Session error:", err);
-    setTurn("error", "Error: " + err.message);
-  }
+// ─── SCREEN 3: BRIEFING ───
+function goToBriefing(){
+var a=AGENTS[selAgent];
+document.getElementById("brAv").src=a.avatar;
+document.getElementById("brName").textContent=a.name;
+document.getElementById("brRole").textContent=a.role;
+var scName,scCtx;
+if(selSc>=0){scName=SCENARIOS[selSc].name;scCtx=SCENARIOS[selSc].prompt}
+else{var ct=document.getElementById("customScenario").value.trim();scName="Custom Scenario";scCtx=ct}
+document.getElementById("brScenario").innerHTML="<strong>Your scenario:</strong> "+scName+(selSc===-1?" — "+scCtx:"")+"<br><br><strong>Focus:</strong> "+GOALS[selGoal].name+"<br><strong>Level:</strong> "+DIFFS[diffVal].label;
+showScr("scrBrief");
 }
 
-// ─── SERVER EVENTS ──────────────────────────────────────
-function handleServerEvent(e) {
-  var event;
-  try { event = JSON.parse(e.data); } catch(x) { return; }
+// ═══════════════════════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════════════════════
+async function startSession(){
+if(!apiKey){openModal();return}
+var a=AGENTS[selAgent];
 
-  switch (event.type) {
-    case "response.audio.delta":
-      if (!isAgentSpeaking) {
-        isAgentSpeaking = true;
-        setTurn("agent-speaking", currentAgent.name + " is speaking...");
-      }
-      document.getElementById("sessionAvatar").classList.add("speaking");
-      break;
+// Build system instructions
+var scenarioPrompt=selSc>=0?SCENARIOS[selSc].prompt:("The user has described this specific scenario: "+document.getElementById("customScenario").value.trim()+". Simulate this situation realistically.");
+var instructions=a.base+"\n\nSESSION GOAL:\n"+GOALS[selGoal].prompt+"\n\nSCENARIO:\n"+scenarioPrompt+"\n\nDIFFICULTY LEVEL:\n"+DIFFS[diffVal].prompt+"\n\nWARM-UP PHASE:\nStart the conversation with 2-3 casual warm-up exchanges before transitioning to the scenario. Ask how their week is going, or mention something light. Then naturally transition with something like 'So, shall we get into it?' or 'Alright, so I understand you wanted to discuss...'. Mark the transition clearly.";
 
-    case "response.audio.done":
-      document.getElementById("sessionAvatar").classList.remove("speaking");
-      isAgentSpeaking = false;
-      setTurn("listening", "Your turn — start speaking");
-      break;
+// UI
+document.getElementById("sessAv").src=a.avatar;
+document.getElementById("sessName").textContent=a.name;
+document.getElementById("sessRole").textContent=a.role;
+document.getElementById("transcript").innerHTML="";
+document.getElementById("warmupLabel").style.display="block";
+warmupDone=false;
 
-    case "response.audio_transcript.delta":
-      currentAssistantText += event.delta || "";
-      updateLastMessage("assistant", currentAssistantText, currentAgent.name);
-      break;
+userTurns=0;agentTurns=0;userWords=0;transcript=[];turnTimestamps=[];
+curAssText="";curUserText="";pendEl=null;pendRole=null;isAgentSpeaking=false;
 
-    case "response.audio_transcript.done":
-      if (currentAssistantText) {
-        finalizeMessage("assistant", currentAssistantText, currentAgent.name);
-        fullTranscript.push({ role: "assistant", text: currentAssistantText });
-        agentTurns++;
-        document.getElementById("statAgentTurns").textContent = agentTurns;
-      }
-      currentAssistantText = "";
-      break;
+setTurn("connecting","Connecting...");
+showScr("scrSession");
 
-    case "conversation.item.input_audio_transcription.delta":
-      currentUserText += event.delta || "";
-      updateLastMessage("user", currentUserText, "You");
-      break;
+try{
+setTurn("connecting","Getting session token...");
+var res=await fetch("/api/session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({voice:a.voice,instructions:instructions,model:"gpt-realtime-mini",apiKey:apiKey})});
+var data=await res.json();
+if(!res.ok){if(data.error==="NO_KEY"){setTurn("error","No API key");openModal();return}throw new Error(data.message||"Session failed")}
+var ek=data.clientSecret;if(!ek)throw new Error("No client secret. Check OpenAI billing.");
 
-    case "conversation.item.input_audio_transcription.completed":
-      var t = event.transcript || currentUserText;
-      if (t) {
-        finalizeMessage("user", t, "You");
-        fullTranscript.push({ role: "user", text: t });
-        userTurns++;
-        userWordCount += t.split(/\s+/).filter(function(w){return w.length > 0}).length;
-        document.getElementById("statUserTurns").textContent = userTurns;
-        document.getElementById("statUserWords").textContent = userWordCount;
-      }
-      currentUserText = "";
-      break;
+setTurn("connecting","Requesting microphone...");
+stream=await navigator.mediaDevices.getUserMedia({audio:true});
 
-    case "input_audio_buffer.speech_started":
-      setTurn("listening", "Listening...");
-      break;
+setTurn("connecting","Establishing connection...");
+pc=new RTCPeerConnection();
+var audio=document.createElement("audio");audio.autoplay=true;
+pc.ontrack=function(e){audio.srcObject=e.streams[0]};
+stream.getTracks().forEach(function(t){pc.addTrack(t,stream)});
 
-    case "input_audio_buffer.speech_stopped":
-      document.getElementById("sessionAvatar").classList.remove("speaking");
-      setTurn("thinking", "Processing...");
-      break;
+dc=pc.createDataChannel("oai-events");
+dc.addEventListener("message",handleEvent);
 
-    case "error":
-      console.error("Realtime error:", event.error);
-      addSystemMessage("Error: " + ((event.error && event.error.message) || "Unknown"));
-      break;
-  }
+var offer=await pc.createOffer();
+await pc.setLocalDescription(offer);
+
+var sdp=await fetch("https://api.openai.com/v1/realtime/calls",{method:"POST",body:offer.sdp,headers:{"Authorization":"Bearer "+ek,"Content-Type":"application/sdp"}});
+if(!sdp.ok)throw new Error("WebRTC failed ("+sdp.status+")");
+await pc.setRemoteDescription({type:"answer",sdp:await sdp.text()});
+
+pc.onconnectionstatechange=function(){
+if(pc.connectionState==="connected"){setTurn("warmup","☕ Warming up...");startTimer();
+warmupTimer=setTimeout(function(){warmupDone=true;document.getElementById("warmupLabel").style.display="none"},65000)}
+else if(pc.connectionState==="failed"||pc.connectionState==="disconnected")setTurn("error","Connection lost")
+};
+}catch(err){console.error(err);setTurn("error","Error: "+err.message)}
 }
 
-// ─── TRANSCRIPT ─────────────────────────────────────────
-function updateLastMessage(role, text, label) {
-  var box = document.getElementById("transcript");
-  if (pendingMsgEl && pendingMsgRole === role) {
-    pendingMsgEl.querySelector(".text").textContent = text;
-  } else {
-    pendingMsgEl = document.createElement("div");
-    pendingMsgEl.className = "msg " + role;
-    pendingMsgEl.innerHTML = "<div class='label'>" + label + "</div><div class='text'>" + text + "</div>";
-    pendingMsgRole = role;
-    box.appendChild(pendingMsgEl);
-  }
-  box.scrollTop = box.scrollHeight;
+// ─── EVENTS ───
+function handleEvent(e){
+var ev;try{ev=JSON.parse(e.data)}catch(x){return}
+var a=AGENTS[selAgent];
+switch(ev.type){
+case"response.audio.delta":
+if(!isAgentSpeaking){isAgentSpeaking=true;setTurn("agent-turn",a.first+" is speaking...");turnTimestamps.push({role:"agent",startMs:Date.now()})}
+document.getElementById("sessAv").classList.add("speaking");
+break;
+
+case"response.audio.done":
+document.getElementById("sessAv").classList.remove("speaking");
+isAgentSpeaking=false;
+setTurn("user-turn","Your turn");
+break;
+
+case"response.audio_transcript.delta":
+curAssText+=(ev.delta||"");
+updateMsg("assistant",curAssText,a.first);
+break;
+
+case"response.audio_transcript.done":
+if(curAssText){finalMsg("assistant",curAssText,a.first);transcript.push({role:"assistant",text:curAssText});agentTurns++}
+curAssText="";
+break;
+
+case"conversation.item.input_audio_transcription.delta":
+curUserText+=(ev.delta||"");
+updateMsg("user",curUserText,"You");
+break;
+
+case"conversation.item.input_audio_transcription.completed":
+var t=ev.transcript||curUserText;
+if(t){finalMsg("user",t,"You");transcript.push({role:"user",text:t});userTurns++;userWords+=t.split(/\s+/).filter(function(w){return w.length>0}).length;turnTimestamps.push({role:"user",startMs:Date.now()})}
+curUserText="";
+break;
+
+case"input_audio_buffer.speech_started":
+setTurn("user-turn","Listening...");
+turnTimestamps.push({role:"user_start",startMs:Date.now()});
+break;
+
+case"input_audio_buffer.speech_stopped":
+document.getElementById("sessAv").classList.remove("speaking");
+setTurn("processing","Processing...");
+break;
+
+case"error":
+console.error("RT error:",ev.error);
+addSysMsg("Error: "+((ev.error&&ev.error.message)||"Unknown"));
+break;
+}
 }
 
-function finalizeMessage(role, text, label) {
-  if (pendingMsgEl && pendingMsgRole === role) {
-    pendingMsgEl.querySelector(".text").textContent = text;
-    pendingMsgEl = null; pendingMsgRole = null;
-  } else {
-    var box = document.getElementById("transcript");
-    var el = document.createElement("div");
-    el.className = "msg " + role;
-    el.innerHTML = "<div class='label'>" + label + "</div><div class='text'>" + text + "</div>";
-    box.appendChild(el);
-    box.scrollTop = box.scrollHeight;
-  }
+function setTurn(cls,txt){var el=document.getElementById("turnInd");el.className="turn-ind "+cls;document.getElementById("turnTxt").textContent=txt}
+
+function updateMsg(role,text,label){
+var box=document.getElementById("transcript");
+if(pendEl&&pendRole===role){pendEl.querySelector(".txt").textContent=text}
+else{pendEl=document.createElement("div");pendEl.className="msg "+role;pendEl.innerHTML="<div class='lbl'>"+label+"</div><div class='txt'>"+text+"</div>";pendRole=role;box.appendChild(pendEl)}
+box.scrollTop=box.scrollHeight;
+}
+function finalMsg(role,text,label){
+if(pendEl&&pendRole===role){pendEl.querySelector(".txt").textContent=text;pendEl=null;pendRole=null}
+else{var box=document.getElementById("transcript");var el=document.createElement("div");el.className="msg "+role;el.innerHTML="<div class='lbl'>"+label+"</div><div class='txt'>"+text+"</div>";box.appendChild(el);box.scrollTop=box.scrollHeight}
+}
+function addSysMsg(text){var box=document.getElementById("transcript");var el=document.createElement("div");el.style.cssText="text-align:center;color:#64748b;font-size:12px;padding:6px";el.textContent=text;box.appendChild(el)}
+
+function startTimer(){startTime=Date.now();timerInt=setInterval(function(){var s=Math.floor((Date.now()-startTime)/1000);document.getElementById("timer").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")},1000)}
+
+function toggleMute(){
+isMuted=!isMuted;
+if(stream)stream.getAudioTracks().forEach(function(t){t.enabled=!isMuted});
+document.getElementById("muteBtn").textContent=isMuted?"🔇":"🎤";
+if(isMuted)document.getElementById("muteBtn").classList.add("muted");else document.getElementById("muteBtn").classList.remove("muted");
 }
 
-function addSystemMessage(text) {
-  var box = document.getElementById("transcript");
-  var el = document.createElement("div");
-  el.style.cssText = "text-align:center;color:#64748b;font-size:12px;padding:8px;";
-  el.textContent = text;
-  box.appendChild(el);
-  box.scrollTop = box.scrollHeight;
+// ═══════════════════════════════════════════════════════════
+// END SESSION + REPORT
+// ═══════════════════════════════════════════════════════════
+function endSession(){
+var dur="00:00",durSec=0;
+if(startTime){durSec=Math.floor((Date.now()-startTime)/1000);dur=String(Math.floor(durSec/60)).padStart(2,"0")+":"+String(durSec%60).padStart(2,"0")}
+if(timerInt)clearInterval(timerInt);
+if(warmupTimer)clearTimeout(warmupTimer);
+if(dc)try{dc.close()}catch(x){}
+if(pc)try{pc.close()}catch(x){}
+if(stream)stream.getTracks().forEach(function(t){t.stop()});
+pc=null;dc=null;stream=null;isMuted=false;isAgentSpeaking=false;pendEl=null;pendRole=null;curAssText="";curUserText="";
+
+if(transcript.length>2)generateReport(dur,durSec);
+else{showScr("scrPick")}
 }
 
-// ─── TIMER ──────────────────────────────────────────────
-function startTimer() {
-  sessionStartTime = Date.now();
-  timerInterval = setInterval(function() {
-    var s = Math.floor((Date.now() - sessionStartTime) / 1000);
-    var m = String(Math.floor(s / 60)).padStart(2, "0");
-    var sec = String(s % 60).padStart(2, "0");
-    var t = m + ":" + sec;
-    document.getElementById("timer").textContent = t;
-    document.getElementById("statDuration").textContent = t;
-  }, 1000);
+async function generateReport(dur,durSec){
+showScr("scrReport");
+document.getElementById("rptLoading").style.display="block";
+document.getElementById("rptContent").style.display="none";
+
+var a=AGENTS[selAgent];
+var txText=transcript.map(function(m){return(m.role==="user"?"USER":"AGENT")+": "+m.text}).join("\n");
+
+// Calculate confidence metrics
+var avgWordsPerTurn=userTurns>0?Math.round(userWords/userTurns):0;
+var avgResponseTime="N/A";
+var responseTimes=[];
+for(var i=1;i<turnTimestamps.length;i++){
+if(turnTimestamps[i].role==="user_start"&&turnTimestamps[i-1].role==="agent"){
+responseTimes.push(turnTimestamps[i].startMs-turnTimestamps[i-1].startMs);
+}
+}
+if(responseTimes.length>0){
+var avgMs=responseTimes.reduce(function(a,b){return a+b},0)/responseTimes.length;
+avgResponseTime=(avgMs/1000).toFixed(1)+"s";
 }
 
-// ─── MUTE ───────────────────────────────────────────────
-function toggleMute() {
-  isMuted = !isMuted;
-  if (localStream) {
-    var tracks = localStream.getAudioTracks();
-    for (var i = 0; i < tracks.length; i++) tracks[i].enabled = !isMuted;
-  }
-  document.getElementById("muteBtn").textContent = isMuted ? "🔇" : "🎤";
-  if (isMuted) document.getElementById("muteBtn").classList.add("muted");
-  else document.getElementById("muteBtn").classList.remove("muted");
+var prompt='You are an expert Business English communication coach. Analyze this conversation and return a JSON object ONLY (no markdown, no backticks, no explanation — raw JSON).\n\nSession info:\n- Goal: '+GOALS[selGoal].name+'\n- Scenario: '+(selSc>=0?SCENARIOS[selSc].name:"Custom")+'\n- Difficulty: '+DIFFS[diffVal].label+'\n- Duration: '+dur+'\n- User turns: '+userTurns+'\n- User words: '+userWords+'\n- Avg words/turn: '+avgWordsPerTurn+'\n- Avg response time: '+avgResponseTime+'\n\nTRANSCRIPT:\n'+txText+'\n\nReturn this exact JSON structure:\n{\n  "cefrLevel": "B1" or "B2" or "C1" etc,\n  "cefrScore": number 0-100 (percentage within that level),\n  "subScores": {\n    "grammar": number 0-100,\n    "vocabulary": number 0-100,\n    "fluency": number 0-100,\n    "taskAchievement": number 0-100\n  },\n  "bestMoment": {\n    "quote": "exact quote from user",\n    "why": "why this was good (1 sentence)"\n  },\n  "corrections": [\n    {"said": "what user said", "better": "corrected version", "note": "brief explanation"},\n    {"said": "...", "better": "...", "note": "..."}\n  ],\n  "registerSuggestions": [\n    {"said": "what user said (too casual/direct)", "try": "more professional version", "context": "when to use this"},\n    {"said": "...", "try": "...", "context": "..."}\n  ],\n  "phrasesToSteal": [\n    {"phrase": "business phrase from agent", "meaning": "what it means", "example": "example in a sentence"},\n    {"phrase": "...", "meaning": "...", "example": "..."}\n  ],\n  "pronunciationNotes": [\n    {"word": "word that may be tricky", "phonetic": "pronunciation guide", "tip": "common mistake"}\n  ],\n  "confidenceAssessment": "1-2 sentences on their confidence level based on response times, turn length, and hesitation patterns",\n  "mission": "One specific, concrete thing to practice before next session"\n}\n\nProvide 2-3 corrections, 2-3 register suggestions, 4-5 phrases to steal, 2-3 pronunciation notes. Be specific using their actual words. Be encouraging but honest.';
+
+try{
+var res=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:"gpt-4o-mini",messages:[{role:"user",content:prompt}],max_tokens:1500,temperature:0.7})});
+var data=await res.json();
+var raw=data.choices[0].message.content;
+// Strip markdown backticks if present
+raw=raw.replace(/```json\s*/g,"").replace(/```\s*/g,"").trim();
+var rpt=JSON.parse(raw);
+renderReport(rpt,dur,durSec,avgWordsPerTurn,avgResponseTime);
+}catch(err){
+console.error("Report error:",err);
+document.getElementById("rptContent").innerHTML='<div class="rpt-section"><p style="color:#ef4444">Error generating report: '+err.message+'</p><p style="color:#94a3b8;margin-top:8px">This usually means the transcript was too short or the API key ran out of credits.</p></div>';
+document.getElementById("rptContent").style.display="block";
+document.getElementById("rptLoading").style.display="none";
+renderReportActions();
+}
 }
 
-// ─── END SESSION ────────────────────────────────────────
-function endSession() {
-  var duration = "00:00";
-  if (sessionStartTime) {
-    var s = Math.floor((Date.now() - sessionStartTime) / 1000);
-    duration = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
-  }
+function renderReport(r,dur,durSec,avgWpt,avgRt){
+var a=AGENTS[selAgent];
+// CEFR ring calc
+var levels={"A2":20,"B1":40,"B2":60,"C1":80,"C2":100};
+var ringPct=((levels[r.cefrLevel]||50)-20+r.cefrScore*0.2);
+var circ=2*Math.PI*47;
+var offset=circ*(1-ringPct/100);
 
-  if (timerInterval) clearInterval(timerInterval);
-  if (dataChannel) try { dataChannel.close(); } catch(x) {}
-  if (peerConnection) try { peerConnection.close(); } catch(x) {}
-  if (localStream) { var t = localStream.getTracks(); for (var i = 0; i < t.length; i++) t[i].stop(); }
-  peerConnection = null; dataChannel = null; localStream = null;
-  isMuted = false; isAgentSpeaking = false;
-  pendingMsgEl = null; pendingMsgRole = null;
-  currentAssistantText = ""; currentUserText = "";
-  document.getElementById("muteBtn").classList.remove("muted");
-  document.getElementById("muteBtn").textContent = "🎤";
-  document.getElementById("timer").textContent = "00:00";
-  document.getElementById("sessionAvatar").classList.remove("speaking");
+// Sub-score colors
+function scoreColor(v){if(v>=75)return"#22c55e";if(v>=50)return"#f59e0b";return"#ef4444"}
 
-  // Show feedback if we have transcript
-  if (fullTranscript.length > 2) {
-    showFeedback(duration);
-  } else {
-    backToSelect();
-  }
+var html='<div class="rpt-hdr"><h1>Coaching Report</h1><div class="rpt-meta">'+dur+' with '+a.name+' · '+GOALS[selGoal].name+' · '+DIFFS[diffVal].label+'</div></div>';
+
+// ─── CEFR SCORE ───
+html+='<div class="score-ring-wrap"><div class="score-card"><div class="ring-container"><svg width="110" height="110" viewBox="0 0 110 110"><circle class="ring-bg" cx="55" cy="55" r="47"/><circle class="ring-fg" cx="55" cy="55" r="47" style="stroke:'+scoreColor(ringPct)+';stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+'"/></svg><div class="ring-label"><div class="ring-level">'+r.cefrLevel+'</div><div class="ring-sub">Level</div></div></div>';
+html+='<div class="score-details">';
+var subs=[["Grammar",r.subScores.grammar],["Vocabulary",r.subScores.vocabulary],["Fluency",r.subScores.fluency],["Task",r.subScores.taskAchievement]];
+for(var i=0;i<subs.length;i++){
+html+='<div class="sd-row"><div class="sd-label">'+subs[i][0]+'</div><div class="sd-bar-wrap"><div class="sd-bar"><div class="sd-bar-fill" style="width:'+subs[i][1]+'%;background:'+scoreColor(subs[i][1])+'"></div></div><div class="sd-val" style="color:'+scoreColor(subs[i][1])+'">'+subs[i][1]+'</div></div></div>';
+}
+html+='</div></div></div>';
+
+// ─── CONFIDENCE ───
+html+='<div class="rpt-section"><h3><span class="ico">💪</span>Confidence Metrics</h3><div class="conf-grid"><div class="conf-stat"><div class="conf-val">'+avgWpt+'</div><div class="conf-lbl">Avg words / turn</div></div><div class="conf-stat"><div class="conf-val">'+avgRt+'</div><div class="conf-lbl">Avg response time</div></div><div class="conf-stat"><div class="conf-val">'+userTurns+'</div><div class="conf-lbl">Your turns</div></div></div>';
+html+='<p style="font-size:13px;color:#94a3b8;margin-top:12px;line-height:1.5">'+r.confidenceAssessment+'</p></div>';
+
+// ─── BEST MOMENT ───
+html+='<div class="rpt-section"><h3><span class="ico">⭐</span>Your Best Moment</h3><div class="best-quote">"'+escHtml(r.bestMoment.quote)+'"</div><div class="best-why">'+escHtml(r.bestMoment.why)+'</div></div>';
+
+// ─── CORRECTIONS ───
+if(r.corrections&&r.corrections.length){
+html+='<div class="rpt-section"><h3><span class="ico">🔧</span>Try This Instead</h3>';
+for(var i=0;i<r.corrections.length;i++){
+var c=r.corrections[i];
+html+='<div class="correction"><div class="corr-before">✗ "'+escHtml(c.said)+'"</div><div class="corr-after">✓ "'+escHtml(c.better)+'"</div><div class="corr-note">'+escHtml(c.note)+'</div></div>';
+}
+html+='</div>';
 }
 
-// ─── FEEDBACK ───────────────────────────────────────────
-async function showFeedback(duration) {
-  showScreen("feedbackScreen");
-  document.getElementById("feedbackLoading").style.display = "block";
-  document.getElementById("feedbackContent").style.display = "none";
-  document.getElementById("feedbackActions").style.display = "none";
-
-  var scenario = SCENARIOS[selectedScenarioIdx];
-  var transcriptText = fullTranscript.map(function(m) {
-    return (m.role === "user" ? "USER" : "AGENT") + ": " + m.text;
-  }).join("\n");
-
-  var feedbackPrompt = "You are an expert Business English communication coach. Analyze this practice conversation and provide actionable feedback.\n\nScenario: " + scenario.name + "\nDuration: " + duration + "\nUser turns: " + userTurns + "\nUser word count: " + userWordCount + "\n\nTRANSCRIPT:\n" + transcriptText + "\n\nProvide feedback in this exact format using these HTML tags:\n<h3>Overall Performance</h3>\n<p>2-3 sentences on overall impression and estimated CEFR level (A2/B1/B2/C1/C2).</p>\n\n<h3>Strengths</h3>\n<p>2-3 specific things they did well with examples from the conversation.</p>\n\n<h3>Areas for Improvement</h3>\n<p>2-3 specific areas with concrete examples of errors or weak phrasing and how to fix them.</p>\n\n<h3>Vocabulary & Grammar</h3>\n<p>Note any grammar errors, suggest better word choices or phrases they could have used.</p>\n\n<h3>Key Takeaway</h3>\n<p>One focused thing to practice before their next session.</p>\n\nKeep it encouraging but honest. Be specific with examples from their actual words.";
-
-  try {
-    var body = { apiKey: manualApiKey };
-    // Use a regular chat completion for feedback
-    var res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + manualApiKey,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: feedbackPrompt }],
-        max_tokens: 1000
-      })
-    });
-
-    var data = await res.json();
-    if (data.choices && data.choices[0]) {
-      document.getElementById("feedbackContent").innerHTML = data.choices[0].message.content;
-    } else {
-      document.getElementById("feedbackContent").innerHTML = "<p>Could not generate feedback. Try again.</p>";
-    }
-  } catch (err) {
-    document.getElementById("feedbackContent").innerHTML = "<p>Error generating feedback: " + err.message + "</p>";
-  }
-
-  document.getElementById("feedbackLoading").style.display = "none";
-  document.getElementById("feedbackContent").style.display = "block";
-  document.getElementById("feedbackActions").style.display = "flex";
+// ─── REGISTER ───
+if(r.registerSuggestions&&r.registerSuggestions.length){
+html+='<div class="rpt-section"><h3><span class="ico">🎩</span>Level Up Your Register</h3>';
+for(var i=0;i<r.registerSuggestions.length;i++){
+var rg=r.registerSuggestions[i];
+html+='<div class="reg-item"><div class="reg-said">You said: "'+escHtml(rg.said)+'"</div><div class="reg-try">Try: "'+escHtml(rg.try)+'"</div><div class="reg-why">'+escHtml(rg.context)+'</div></div>';
+}
+html+='</div>';
 }
 
-function backToSelect() {
-  currentAgent = null; currentAgentId = null;
-  fullTranscript = [];
-  showScreen("selectScreen");
+// ─── PHRASES TO STEAL ───
+if(r.phrasesToSteal&&r.phrasesToSteal.length){
+html+='<div class="rpt-section"><h3><span class="ico">💎</span>Phrases to Steal</h3><div class="phrase-cards">';
+for(var i=0;i<r.phrasesToSteal.length;i++){
+var p=r.phrasesToSteal[i];
+html+='<div class="phrase-card" onclick="this.classList.toggle(\'flipped\')"><div class="pc-flip">tap for example</div><div class="pc-phrase">'+escHtml(p.phrase)+'</div><div class="pc-meaning">'+escHtml(p.meaning)+'</div></div>';
+}
+html+='</div></div>';
 }
 
-function tryAgain() {
-  fullTranscript = [];
-  showScreen("selectScreen");
-  // Immediately start with same settings
-  startSession();
+// ─── PRONUNCIATION ───
+if(r.pronunciationNotes&&r.pronunciationNotes.length){
+html+='<div class="rpt-section"><h3><span class="ico">🗣️</span>Pronunciation Notes</h3>';
+for(var i=0;i<r.pronunciationNotes.length;i++){
+var pn=r.pronunciationNotes[i];
+html+='<div class="pron-item"><div class="pron-word">'+escHtml(pn.word)+'</div><div class="pron-phonetic">'+escHtml(pn.phonetic)+'</div><div class="pron-note">'+escHtml(pn.tip)+'</div></div>';
+}
+html+='</div>';
 }
 
-// ─── KEYBOARD ───────────────────────────────────────────
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Escape" && document.getElementById("sessionScreen").classList.contains("active")) endSession();
-  if (e.key === "m" && document.getElementById("sessionScreen").classList.contains("active") && document.activeElement.tagName !== "INPUT") toggleMute();
+// ─── MISSION ───
+html+='<div class="rpt-section"><div class="mission-box"><div class="m-title">🎯 Your Mission</div><div class="m-text">'+escHtml(r.mission)+'</div></div></div>';
+
+html+=renderReportActionsHtml();
+
+document.getElementById("rptContent").innerHTML=html;
+document.getElementById("rptContent").style.display="block";
+document.getElementById("rptLoading").style.display="none";
+}
+
+function renderReportActionsHtml(){
+return '<div class="rpt-actions"><button class="rpt-btn-back" onclick="showScr(\'scrPick\')">New Session</button><button class="rpt-btn-again" onclick="retrySession()">Practice Again</button></div>';
+}
+function renderReportActions(){
+var el=document.createElement("div");el.innerHTML=renderReportActionsHtml();
+document.getElementById("rptContent").appendChild(el.firstChild);
+}
+
+function retrySession(){showScr("scrBrief");startSession()}
+
+function escHtml(s){if(!s)return"";return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+// ═══════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape"&&document.getElementById("scrSession").classList.contains("active"))endSession();
+if(e.key==="m"&&document.getElementById("scrSession").classList.contains("active")&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA")toggleMute();
 });
 </script>
 </body>
