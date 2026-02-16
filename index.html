@@ -110,13 +110,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sess-agent h2{font-size:17px;margin-bottom:1px}
 .sess-agent .role{color:#f59e0b;font-size:11px}
 
-.turn-ind{display:flex;align-items:center;gap:8px;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:10px;transition:all 0.3s;min-width:220px;justify-content:center}
-.turn-ind.user-turn{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.2)}
-.turn-ind.agent-turn{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
-.turn-ind.processing{background:rgba(148,163,184,0.08);color:#94a3b8;border:1px solid rgba(148,163,184,0.15)}
-.turn-ind.connecting{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
-.turn-ind.warmup{background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.2)}
-.turn-ind.error{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)}
+.turn-ind{display:flex;align-items:center;gap:10px;padding:12px 28px;border-radius:24px;font-size:15px;font-weight:700;margin-bottom:10px;transition:all 0.3s;min-width:240px;justify-content:center;letter-spacing:0.3px}
+.turn-ind.user-turn{background:rgba(34,197,94,0.15);color:#22c55e;border:2px solid rgba(34,197,94,0.35);box-shadow:0 0 20px rgba(34,197,94,0.1)}
+.turn-ind.agent-turn{background:rgba(245,158,11,0.15);color:#f59e0b;border:2px solid rgba(245,158,11,0.35);box-shadow:0 0 20px rgba(245,158,11,0.1)}
+.turn-ind.processing{background:rgba(148,163,184,0.08);color:#94a3b8;border:2px solid rgba(148,163,184,0.15)}
+.turn-ind.connecting{background:rgba(245,158,11,0.1);color:#f59e0b;border:2px solid rgba(245,158,11,0.2)}
+.turn-ind.warmup{background:rgba(99,102,241,0.12);color:#818cf8;border:2px solid rgba(99,102,241,0.25)}
+.turn-ind.error{background:rgba(239,68,68,0.12);color:#ef4444;border:2px solid rgba(239,68,68,0.25)}
 .t-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .t-dot.pulse{animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
@@ -576,44 +576,94 @@ else if(s==="failed"||s==="disconnected"){setTurn("error","Connection lost")}
 }
 
 // ─── EVENTS ───
+var gotAgentTranscript=false; // track if streaming transcript worked
+
 function handleEvent(e){
 var ev;try{ev=JSON.parse(e.data)}catch(x){return}
 var a=AGENTS[selAgentId];
 
-// Debug: log event types
-if(ev.type&&!ev.type.includes("audio.delta")&&ev.type!=="response.audio.delta"){console.log("[EV]",ev.type,ev)}
+// Debug: log ALL non-audio-binary events
+if(ev.type){console.log("[EV]",ev.type,ev.type.includes("transcript")?"📝":"",ev)}
 
 switch(ev.type){
-case"response.audio.delta":
-if(!isAgentSpeaking){isAgentSpeaking=true;setTurn("agent-turn",a.first+" is speaking...");turnTs.push({role:"agent",ms:Date.now()})}
+
+// ═══ TURN DETECTION (WebRTC-specific events) ═══
+case"output_audio_buffer.started":
+// WebRTC-only: server started streaming audio to us
+if(!isAgentSpeaking){isAgentSpeaking=true;turnTs.push({role:"agent",ms:Date.now()})}
+setTurn("agent-turn",a.first+" is speaking...");
 document.getElementById("sessAv").classList.add("speaking");
 break;
 
-case"response.audio.done":
+case"output_audio_buffer.stopped":
+// WebRTC-only: server done streaming audio
 document.getElementById("sessAv").classList.remove("speaking");
 isAgentSpeaking=false;
-setTurn("user-turn","Your turn");
+setTurn("user-turn","Your turn — speak now");
 break;
 
-// ─── AGENT transcript ───
+// ═══ AGENT TRANSCRIPT (streaming) ═══
 case"response.audio_transcript.delta":
+gotAgentTranscript=true;
 curAsstText+=(ev.delta||"");
 upsertMsg("assistant",curAsstText,a.first);
 break;
 
 case"response.audio_transcript.done":
+gotAgentTranscript=true;
 var finalText=ev.transcript||curAsstText;
 if(finalText){
 commitMsg("assistant",finalText,a.first);
 txLog.push({role:"assistant",text:finalText});
 agentTurns++;
-// Check if this was a definition response
 if(expectDef){showSticky(finalText);expectDef=false}
 }
 curAsstText="";
 break;
 
-// ─── USER transcript ───
+// ═══ FALLBACK: extract transcript from response.done ═══
+case"response.done":
+if(!gotAgentTranscript&&ev.response&&ev.response.output){
+// Streaming transcript didn't work, extract from response
+for(var i=0;i<ev.response.output.length;i++){
+var item=ev.response.output[i];
+if(item.content){
+for(var j=0;j<item.content.length;j++){
+var c=item.content[j];
+if(c.transcript&&c.transcript.length>0){
+commitMsg("assistant",c.transcript,a.first);
+txLog.push({role:"assistant",text:c.transcript});
+agentTurns++;
+if(expectDef){showSticky(c.transcript);expectDef=false}
+}
+}
+}
+}
+}
+gotAgentTranscript=false; // reset for next response
+break;
+
+// ═══ FALLBACK 2: conversation.item.done ═══
+case"conversation.item.done":
+// Another fallback path for agent transcript
+if(ev.item&&ev.item.role==="assistant"&&ev.item.content){
+for(var k=0;k<ev.item.content.length;k++){
+var ct=ev.item.content[k];
+if(ct.transcript&&ct.transcript.length>0&&!gotAgentTranscript){
+// Only use if we didn't already get it from streaming
+var isDup=txLog.length>0&&txLog[txLog.length-1].text===ct.transcript;
+if(!isDup){
+commitMsg("assistant",ct.transcript,a.first);
+txLog.push({role:"assistant",text:ct.transcript});
+agentTurns++;
+if(expectDef){showSticky(ct.transcript);expectDef=false}
+}
+}
+}
+}
+break;
+
+// ═══ USER TRANSCRIPT ═══
 case"conversation.item.input_audio_transcription.delta":
 curUserText+=(ev.delta||"");
 upsertMsg("user",curUserText,"You");
@@ -628,13 +678,14 @@ userTurns++;
 userWords+=t.split(/\s+/).filter(function(w){return w.length>0}).length;
 // Check if user is asking for a definition
 var lower=t.toLowerCase();
-if(lower.includes("what does")||lower.includes("what is")||lower.includes("what do you mean")||lower.includes("can you explain")||lower.includes("meaning of")||lower.includes("what's that mean")||lower.includes("i don't understand")){
+if(lower.includes("what does")||lower.includes("what is")||lower.includes("what do you mean")||lower.includes("can you explain")||lower.includes("meaning of")||lower.includes("what's that mean")||lower.includes("i don't understand")||lower.includes("define")){
 expectDef=true;
 }
 }
 curUserText="";
 break;
 
+// ═══ USER SPEAKING DETECTION ═══
 case"input_audio_buffer.speech_started":
 setTurn("user-turn","Listening...");
 turnTs.push({role:"user_start",ms:Date.now()});
@@ -643,6 +694,13 @@ break;
 case"input_audio_buffer.speech_stopped":
 document.getElementById("sessAv").classList.remove("speaking");
 setTurn("processing","Processing...");
+break;
+
+// ═══ FALLBACK turn detection if WebRTC events don't fire ═══
+case"response.created":
+if(!isAgentSpeaking){isAgentSpeaking=true;turnTs.push({role:"agent",ms:Date.now()})}
+setTurn("agent-turn",a.first+" is speaking...");
+document.getElementById("sessAv").classList.add("speaking");
 break;
 
 case"error":

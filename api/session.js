@@ -29,7 +29,6 @@ module.exports = async function handler(req, res) {
           type: "realtime",
           model: model,
           instructions: instructions,
-          output_modalities: ["audio"],
           audio: {
             input: {
               transcription: { model: "gpt-4o-mini-transcribe" },
