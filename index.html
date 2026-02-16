@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bastion Voice</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.logo{font-size:18px;font-weight:700;letter-spacing:1px}
+.logo span{color:#f59e0b}
+.settings-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+.settings-btn:hover{background:rgba(255,255,255,0.1);color:#e2e8f0}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#1a1f2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;max-width:460px;width:90%}
+.modal h3{font-size:18px;margin-bottom:8px}
+.modal p{font-size:13px;color:#94a3b8;margin-bottom:20px;line-height:1.5}
+.modal input{width:100%;padding:12px 16px;background:#0a0e1a;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#e2e8f0;font-size:14px;font-family:monospace;margin-bottom:16px}
+.modal input:focus{outline:none;border-color:#f59e0b}
+.modal-actions{display:flex;gap:12px}
+.btn-primary{flex:1;padding:12px;background:#f59e0b;color:#0a0e1a;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer}
+.btn-primary:hover{background:#d97706}
+.btn-secondary{padding:12px 20px;background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:14px;cursor:pointer}
+.screen{display:none}.screen.active{display:block}
+.agent-select{max-width:800px;margin:0 auto;padding:60px 24px;text-align:center}
+.agent-select h1{font-size:28px;font-weight:700;margin-bottom:8px}
+.agent-select .subtitle{color:#94a3b8;font-size:15px;margin-bottom:48px}
+.agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:600px){.agents-grid{grid-template-columns:1fr}}
+.agent-card{background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;cursor:pointer;transition:all 0.3s}
+.agent-card:hover{border-color:rgba(245,158,11,0.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(245,158,11,0.08)}
+.agent-avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 20px;object-fit:cover;border:3px solid rgba(255,255,255,0.1)}
+.agent-card h3{font-size:20px;margin-bottom:4px}
+.agent-card .role{color:#f59e0b;font-size:13px;font-weight:500;margin-bottom:12px}
+.agent-card .desc{color:#94a3b8;font-size:13px;line-height:1.5}
+.agent-card .start-tag{display:inline-block;margin-top:16px;padding:8px 20px;background:rgba(245,158,11,0.1);color:#f59e0b;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.session-view{max-width:640px;margin:0 auto;padding:40px 24px;display:flex;flex-direction:column;align-items:center}
+.session-agent-info{text-align:center;margin-bottom:32px}
+.session-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.1);margin-bottom:16px;transition:box-shadow 0.3s}
+.session-avatar.speaking{box-shadow:0 0 0 8px rgba(245,158,11,0.15),0 0 0 16px rgba(245,158,11,0.05);border-color:#f59e0b}
+.session-agent-info h2{font-size:22px;margin-bottom:4px}
+.session-agent-info .role{color:#f59e0b;font-size:13px}
+.status-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:24px;background:rgba(245,158,11,0.1);color:#f59e0b}
+.status-badge.connected{background:rgba(34,197,94,0.1);color:#22c55e}
+.status-badge.error{background:rgba(239,68,68,0.1);color:#ef4444}
+.status-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.status-dot.pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.transcript-box{width:100%;background:#111827;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;min-height:240px;max-height:400px;overflow-y:auto;margin-bottom:24px}
+.transcript-box:empty::before{content:'Conversation will appear here...';color:#475569;font-style:italic;font-size:14px}
+.msg{margin-bottom:12px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5;max-width:85%}
+.msg.user{background:rgba(245,158,11,0.1);margin-left:auto;text-align:right;border-bottom-right-radius:4px}
+.msg.assistant{background:rgba(255,255,255,0.05);margin-right:auto;border-bottom-left-radius:4px}
+.msg .label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;opacity:0.5}
+.timer{font-size:32px;font-weight:200;font-variant-numeric:tabular-nums;color:#64748b;margin-bottom:24px}
+.controls{display:flex;gap:16px;align-items:center}
+.end-btn{padding:14px 32px;background:#dc2626;color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
+.end-btn:hover{background:#b91c1c}
+.mute-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+.mute-btn.muted{background:rgba(239,68,68,0.15);border-color:#dc2626;color:#dc2626}
+.footer{text-align:center;padding:24px;font-size:11px;color:#334155;letter-spacing:0.5px}
+</style>
+</head>
+<body>
+<div class="modal-overlay" id="keyModal">
+  <div class="modal">
+    <h3>OpenAI API Key</h3>
+    <p>Your key is sent over HTTPS to your own server to mint a one-time session token, then discarded. Never stored.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeKeyModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveKey()">Connect</button>
+    </div>
+  </div>
+</div>
+<div class="header">
+  <div class="logo">BASTION <span>VOICE</span></div>
+  <button class="settings-btn" onclick="openKeyModal()">API Key</button>
+</div>
+<div class="screen active" id="selectScreen">
+  <div class="agent-select">
+    <h1>Practice Lab</h1>
+    <p class="subtitle">Choose your conversation partner</p>
+    <div class="agents-grid">
+      <div class="agent-card" onclick="startSession('marcus')">
+        <img class="agent-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Marcus">
+        <h3>Marcus Chen</h3>
+        <div class="role">Senior VP, Global Operations</div>
+        <div class="desc">Direct, strategic. Will challenge your reasoning and push you to defend your positions.</div>
+        <div class="start-tag">Start Conversation</div>
+      </div>
+      <div class="agent-card" onclick="startSession('elena')">
+        <img class="agent-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Elena">
+        <h3>Elena Dubois</h3>
+        <div class="role">Managing Director, International Consulting</div>
+        <div class="desc">Articulate, sophisticated. Will test your ability to build rapport and present ideas clearly.</div>
+        <div class="start-tag">Start Conversation</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="screen" id="sessionScreen">
+  <div class="session-view">
+    <div class="session-agent-info">
+      <img class="session-avatar" id="sessionAvatar" src="" alt="">
+      <h2 id="sessionName"></h2>
+      <div class="role" id="sessionRole"></div>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <div class="status-dot pulse"></div>
+      <span id="statusText">Connecting...</span>
+    </div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="transcript-box" id="transcript"></div>
+    <div class="controls">
+      <button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="Mute (M)">🎤</button>
+      <button class="end-btn" onclick="endSession()">End Session</button>
+    </div>
+  </div>
+</div>
+<div class="footer">BASTION VOICE</div>
+<script>
+var AGENTS = {
+  marcus: {
+    name: "Marcus Chen",
+    role: "Senior VP, Global Operations",
+    voice: "ash",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    instructions: "You are Marcus Chen, Senior Vice President of Global Operations at a large multinational corporation. You are in a conversation with a business professional who is practicing their English communication skills.\n\nYour personality: Direct, strategic, intellectually rigorous but fair. You speak with authority but respect competence. You occasionally challenge weak arguments.\n\nConversation approach:\n- Start with a warm but professional greeting, then dive into business topics naturally\n- Discuss real scenarios: quarterly results, market expansion, vendor negotiations, team restructuring, board presentations\n- Ask probing follow-up questions that test the person's ability to think clearly and articulate complex ideas\n- If they make noticeable grammar or vocabulary errors, do not interrupt but weave gentle corrections into your own speech naturally\n- Adjust your language complexity based on their level\n- Be encouraging when they express ideas well\n- Keep responses conversational, 2-4 sentences typically, not lectures\n- Occasionally use idiomatic business English that challenges them\n\nYou are NOT a language teacher. You are a senior executive having a real business conversation. The learning happens through the conversation itself."
+  },
+  elena: {
+    name: "Elena Dubois",
+    role: "Managing Director, International Consulting",
+    voice: "marin",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    instructions: "You are Elena Dubois, Managing Director at a prestigious international consulting firm. You are in a conversation with a business professional who is practicing their English communication skills.\n\nYour personality: Articulate, warm but professional, culturally sophisticated. You value clarity and precision in communication. You are diplomatic but direct when needed.\n\nConversation approach:\n- Start with a professional but friendly greeting, establish context naturally\n- Discuss scenarios like: client presentations, cross-cultural team dynamics, stakeholder management, strategic recommendations, project debriefs, pitch meetings\n- Focus on testing their ability to build rapport, present ideas with structure, handle disagreement diplomatically, summarize complex information clearly\n- If they make grammar or vocabulary errors, model the correct form naturally in your response without explicitly correcting them\n- Ask questions that require structured thinking\n- Adjust complexity based on their level\n- Be genuinely interested in their ideas, react naturally\n- Keep responses conversational, 2-4 sentences typically\n- Use sophisticated but accessible business English\n\nYou are NOT a language teacher. You are a senior consulting director having a real business conversation. The learning happens organically through the dialogue."
+  }
+};
+
+var manualApiKey = null;
+var peerConnection = null;
+var dataChannel = null;
+var localStream = null;
+var timerInterval = null;
+var sessionStartTime = null;
+var currentAgent = null;
+var isMuted = false;
+var pendingMsgEl = null;
+var pendingMsgRole = null;
+var currentAssistantText = "";
+var currentUserText = "";
+
+function openKeyModal() {
+  document.getElementById("keyModal").classList.add("active");
+  document.getElementById("apiKeyInput").focus();
+}
+function closeKeyModal() {
+  document.getElementById("keyModal").classList.remove("active");
+}
+function saveKey() {
+  var key = document.getElementById("apiKeyInput").value.trim();
+  if (key && key.startsWith("sk-")) {
+    manualApiKey = key;
+    closeKeyModal();
+  } else {
+    alert("Please enter a valid OpenAI API key (starts with sk-)");
+  }
+}
+function showScreen(id) {
+  var screens = document.querySelectorAll(".screen");
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+  document.getElementById(id).classList.add("active");
+}
+function setStatus(text, type) {
+  document.getElementById("statusBadge").className = "status-badge " + type;
+  document.getElementById("statusText").textContent = text;
+}
+function startTimer() {
+  sessionStartTime = Date.now();
+  timerInterval = setInterval(function() {
+    var s = Math.floor((Date.now() - sessionStartTime) / 1000);
+    var m = String(Math.floor(s / 60)).padStart(2, "0");
+    var sec = String(s % 60).padStart(2, "0");
+    document.getElementById("timer").textContent = m + ":" + sec;
+  }, 1000);
+}
+
+async function startSession(agentId) {
+  if (!manualApiKey) {
+    openKeyModal();
+    return;
+  }
+  currentAgent = AGENTS[agentId];
+  document.getElementById("sessionAvatar").src = currentAgent.avatar;
+  document.getElementById("sessionName").textContent = currentAgent.name;
+  document.getElementById("sessionRole").textContent = currentAgent.role;
+  document.getElementById("transcript").innerHTML = "";
+  setStatus("Connecting...", "");
+  showScreen("sessionScreen");
+
+  try {
+    setStatus("Getting session token...", "");
+    var body = {
+      voice: currentAgent.voice,
+      instructions: currentAgent.instructions,
+      model: "gpt-realtime-mini",
+      apiKey: manualApiKey
+    };
+
+    var tokenRes = await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    var tokenData = await tokenRes.json();
+
+    if (!tokenRes.ok) {
+      if (tokenData.error === "NO_KEY") {
+        setStatus("No API key", "error");
+        openKeyModal();
+        return;
+      }
+      throw new Error(tokenData.message || "Failed to get session token");
+    }
+
+    var ephemeralKey = tokenData.clientSecret;
+    if (!ephemeralKey) throw new Error("No client secret returned. Check OpenAI billing.");
+
+    setStatus("Requesting microphone...", "");
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    setStatus("Establishing connection...", "");
+    peerConnection = new RTCPeerConnection();
+
+    var audioEl = document.createElement("audio");
+    audioEl.autoplay = true;
+    peerConnection.ontrack = function(e) { audioEl.srcObject = e.streams[0]; };
+    var tracks = localStream.getTracks();
+    for (var i = 0; i < tracks.length; i++) {
+      peerConnection.addTrack(tracks[i], localStream);
+    }
+
+    dataChannel = peerConnection.createDataChannel("oai-events");
+    dataChannel.addEventListener("message", handleServerEvent);
+
+    var offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    var sdpRes = await fetch("https://api.openai.com/v1/realtime/calls", {
+      method: "POST",
+      body: offer.sdp,
+      headers: {
+        "Authorization": "Bearer " + ephemeralKey,
+        "Content-Type": "application/sdp"
+      }
+    });
+
+    if (!sdpRes.ok) {
+      var errText = await sdpRes.text();
+      throw new Error("WebRTC handshake failed (" + sdpRes.status + "): " + errText);
+    }
+
+    var sdpAnswer = await sdpRes.text();
+    await peerConnection.setRemoteDescription({ type: "answer", sdp: sdpAnswer });
+
+    peerConnection.onconnectionstatechange = function() {
+      var state = peerConnection.connectionState;
+      if (state === "connected") {
+        setStatus("Connected — start speaking", "connected");
+        startTimer();
+      } else if (state === "failed" || state === "disconnected") {
+        setStatus("Connection lost", "error");
+      }
+    };
+  } catch (err) {
+    console.error("Session error:", err);
+    setStatus("Error: " + err.message, "error");
+  }
+}
+
+function handleServerEvent(e) {
+  var event;
+  try { event = JSON.parse(e.data); } catch(x) { return; }
+  switch (event.type) {
+    case "response.audio.delta":
+      document.getElementById("sessionAvatar").classList.add("speaking");
+      break;
+    case "response.audio.done":
+      document.getElementById("sessionAvatar").classList.remove("speaking");
+      break;
+    case "response.audio_transcript.delta":
+      currentAssistantText += event.delta || "";
+      updateLastMessage("assistant", currentAssistantText, currentAgent.name);
+      break;
+    case "response.audio_transcript.done":
+      if (currentAssistantText) finalizeMessage("assistant", currentAssistantText, currentAgent.name);
+      currentAssistantText = "";
+      break;
+    case "conversation.item.input_audio_transcription.delta":
+      currentUserText += event.delta || "";
+      updateLastMessage("user", currentUserText, "You");
+      break;
+    case "conversation.item.input_audio_transcription.completed":
+      var t = event.transcript || currentUserText;
+      if (t) finalizeMessage("user", t, "You");
+      currentUserText = "";
+      break;
+    case "input_audio_buffer.speech_stopped":
+      document.getElementById("sessionAvatar").classList.remove("speaking");
+      break;
+    case "error":
+      console.error("Realtime error:", event.error);
+      addSystemMessage("Error: " + ((event.error && event.error.message) || "Unknown"));
+      break;
+  }
+}
+
+function updateLastMessage(role, text, label) {
+  var box = document.getElementById("transcript");
+  if (pendingMsgEl && pendingMsgRole === role) {
+    pendingMsgEl.querySelector(".text").textContent = text;
+  } else {
+    pendingMsgEl = document.createElement("div");
+    pendingMsgEl.className = "msg " + role;
+    pendingMsgEl.innerHTML = "<div class='label'>" + label + "</div><div class='text'>" + text + "</div>";
+    pendingMsgRole = role;
+    box.appendChild(pendingMsgEl);
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+function finalizeMessage(role, text, label) {
+  if (pendingMsgEl && pendingMsgRole === role) {
+    pendingMsgEl.querySelector(".text").textContent = text;
+    pendingMsgEl = null;
+    pendingMsgRole = null;
+  } else {
+    var box = document.getElementById("transcript");
+    var el = document.createElement("div");
+    el.className = "msg " + role;
+    el.innerHTML = "<div class='label'>" + label + "</div><div class='text'>" + text + "</div>";
+    box.appendChild(el);
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function addSystemMessage(text) {
+  var box = document.getElementById("transcript");
+  var el = document.createElement("div");
+  el.style.cssText = "text-align:center;color:#64748b;font-size:12px;padding:8px;";
+  el.textContent = text;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  if (localStream) {
+    var tracks = localStream.getAudioTracks();
+    for (var i = 0; i < tracks.length; i++) tracks[i].enabled = !isMuted;
+  }
+  document.getElementById("muteBtn").textContent = isMuted ? "🔇" : "🎤";
+  if (isMuted) document.getElementById("muteBtn").classList.add("muted");
+  else document.getElementById("muteBtn").classList.remove("muted");
+}
+
+function endSession() {
+  if (timerInterval) clearInterval(timerInterval);
+  if (dataChannel) try { dataChannel.close(); } catch(x) {}
+  if (peerConnection) try { peerConnection.close(); } catch(x) {}
+  if (localStream) { var t = localStream.getTracks(); for (var i = 0; i < t.length; i++) t[i].stop(); }
+  peerConnection = null; dataChannel = null; localStream = null;
+  currentAgent = null; isMuted = false;
+  pendingMsgEl = null; pendingMsgRole = null;
+  currentAssistantText = ""; currentUserText = "";
+  document.getElementById("muteBtn").classList.remove("muted");
+  document.getElementById("muteBtn").textContent = "🎤";
+  document.getElementById("timer").textContent = "00:00";
+  document.getElementById("sessionAvatar").classList.remove("speaking");
+  showScreen("selectScreen");
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape" && document.getElementById("sessionScreen").classList.contains("active")) endSession();
+  if (e.key === "m" && document.getElementById("sessionScreen").classList.contains("active")) toggleMute();
+});
+</script>
+</body>
+</html>
