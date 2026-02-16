@@ -1,3 +1,5 @@
 {
-  "version": 2
+  "rewrites": [
+    { "source": "/api/session", "destination": "/api/session.js" }
+  ]
 }
