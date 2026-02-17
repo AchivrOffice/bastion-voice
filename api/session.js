@@ -16,6 +16,7 @@ module.exports = async function handler(req, res) {
   var voice = (req.body && req.body.voice) || "ash";
   var instructions = (req.body && req.body.instructions) || "You are a helpful assistant.";
   var model = (req.body && req.body.model) || "gpt-realtime-mini";
+  var eagerness = (req.body && req.body.eagerness) || "medium";
 
   try {
     var r = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
@@ -32,7 +33,7 @@ module.exports = async function handler(req, res) {
           audio: {
             input: {
               transcription: { model: "gpt-4o-mini-transcribe" },
-              turn_detection: { type: "semantic_vad", eagerness: "medium" }
+              turn_detection: { type: "semantic_vad", eagerness: eagerness }
             },
             output: { voice: voice }
           }
